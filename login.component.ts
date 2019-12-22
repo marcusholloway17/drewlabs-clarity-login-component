@@ -1,4 +1,3 @@
-import { AppUIStoreManager } from './../app-ui-store-manager.service';
 import { ResponseErrorBag } from 'src/app/lib/domain/http/contracts/http-response-data';
 import { AuthUser } from 'src/app/lib/domain/auth/contracts/user';
 import { FormGroup } from '@angular/forms';
@@ -15,8 +14,9 @@ import { AuthenticationService } from 'src/app/lib/application/services/identity
 import { User } from 'src/app/lib/domain/auth/models/user';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { IFormParentComponent } from '../component-interfaces';
 import { AppRoutes } from '../routes-definitions';
+import { IFormParentComponent } from 'src/app/lib/domain/helpers/component-interfaces';
+import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
 
 @Component({
   selector: 'app-login',

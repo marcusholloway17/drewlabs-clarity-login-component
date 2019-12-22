@@ -8,15 +8,15 @@ import {
   OnDestroy
 } from '@angular/core';
 import { IHTMLFormControl } from 'src/app/lib/domain/components/dynamic-inputs/core';
-import { ComponentReactiveFormHelpers } from 'src/app/lib/presentation/component-reactive-form-helpers';
 import { UIState } from 'src/app/lib/domain/components/ui-store/ui-state';
 import { Subscription } from 'rxjs';
-import { AppUIStoreManager } from '../app-ui-store-manager.service';
 import { AlertConfig } from 'src/app/lib/domain/components/app-alert/app-alert.component';
 import { SessionStorage } from 'src/app/lib/domain/storage/core/session-storage.service';
 import { HttpRequestConfigs } from 'src/app/lib/domain/http/core';
 import { isDefined } from 'src/app/lib/domain/utils/type-utils';
-import { TranslatorService } from 'src/app/lib/application/services/translator/translator.service';
+import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
+import { TranslationService } from 'src/app/lib/domain/translator/translator.service';
+import { ComponentReactiveFormHelpers } from 'src/app/lib/domain/helpers/component-reactive-form-helpers';
 
 @Component({
   selector: 'app-login-view',
@@ -39,7 +39,7 @@ export class LoginViewComponent implements OnInit, OnDestroy {
     private builder: FormBuilder,
     public appUIStoreManager: AppUIStoreManager,
     public cache: SessionStorage,
-    public translate: TranslatorService
+    public translate: TranslationService
   ) { }
 
   get alertProperties(): AlertConfig {
