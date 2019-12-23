@@ -9,14 +9,15 @@ import {
   PasswordInput
 } from 'src/app/lib/domain/components/dynamic-inputs/core';
 import { LoginViewComponent } from './login-view.component';
-import { TranslateService } from '@ngx-translate/core';
+// import { TranslateService } from '@ngx-translate/core';
 import { AuthenticationService } from 'src/app/lib/application/services/identity/authentication.service';
 import { User } from 'src/app/lib/domain/auth/models/user';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AppRoutes } from '../routes-definitions';
 import { IFormParentComponent } from 'src/app/lib/domain/helpers/component-interfaces';
 import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
+import { TranslationService } from '../../domain/translator/translator.service';
 
 @Component({
   selector: 'app-login',
@@ -33,15 +34,16 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
   public loginInputsConfig: IHTMLFormControl[] = [];
 
   constructor(
-    private translate: TranslateService,
+    private translate: TranslationService,
     private authService: AuthenticationService,
     private appUIStoreManager: AppUIStoreManager,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
     this.translate
-      .get(['login.username', 'login.password'])
+      .translate(['login.username', 'login.password'])
       .subscribe(values => {
         const username: string = values['login.username']
           ? values['login.username']
@@ -87,7 +89,7 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
 
   onChildComponentFormSubmitted(event: any) {
     this.translate
-      .get([
+      .translate([
         'login.authenticationFailed',
         'login.authenticating',
         'invalidRequestParams',
@@ -109,7 +111,7 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
             // User is authenticated successfully
             if (res instanceof User) {
               // Navigate to dashboard
-              this.router.navigate([AppRoutes.dashboardHomeRoute]);
+              this.router.navigate([this.route.snapshot.data.dashboardPath]);
               this.appUIStoreManager.completeUIStoreAction();
             }
             // The res is null, could not authenticate user
