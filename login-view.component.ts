@@ -59,7 +59,7 @@ export class LoginViewComponent implements OnInit, OnDestroy {
       this.translate.translate('sessionExpired').toPromise().then(translation => {
         this.appUIStoreManager.completeActionWithError(translation);
         setTimeout(() => {
-          this.appUIStoreManager.completeUIStoreAction();
+          this.appUIStoreManager.resetUIStore();
         }, 3000);
       });
     }
