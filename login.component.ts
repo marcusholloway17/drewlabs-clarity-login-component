@@ -6,15 +6,15 @@ import {
   InputTypes,
   IHTMLFormControl,
   TextInput,
-  PasswordInput
+  PasswordInput,
+  CheckBoxInput
 } from 'src/app/lib/domain/components/dynamic-inputs/core';
 import { LoginViewComponent } from './login-view.component';
-// import { TranslateService } from '@ngx-translate/core';
 import { AuthenticationService } from 'src/app/lib/application/services/identity/authentication.service';
 import { User } from 'src/app/lib/domain/auth/models/user';
 import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
-import { AppRoutes } from '../routes-definitions';
+// import { AppRoutes } from '../routes-definitions';
 import { IFormParentComponent } from 'src/app/lib/domain/helpers/component-interfaces';
 import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
 import { TranslationService } from '../../domain/translator/translator.service';
@@ -43,8 +43,9 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
 
   ngOnInit() {
     this.translate
-      .translate(['login.username', 'login.password'])
-      .subscribe(values => {
+      .translate(['login.username', 'login.password', 'login.rememberMe'])
+      .toPromise()
+      .then(values => {
         const username: string = values['login.username']
           ? values['login.username']
           : 'Identifiant';
@@ -78,7 +79,24 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
             },
             minLength: 6,
             value: environment.testUserPassword
-          } as PasswordInput
+          } as PasswordInput,
+          {
+            label: '',
+            type: InputTypes.CHECKBOX_INPUT,
+            placeholder: '',
+            formControlName: 'remember_me',
+            rules: {
+              isRequired: false,
+            },
+            value: true,
+            items: [
+              {
+                value: 1,
+                checked: true,
+                description: values['login.rememberMe']
+              }
+            ]
+          } as CheckBoxInput
         ];
         // Initialise child component input properties manually
         this.childView.controlConfigs = this.loginInputsConfig;
@@ -95,24 +113,27 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
         'invalidRequestParams',
         'serverRequestFailed'
       ])
-      .subscribe(values => {
+      .toPromise()
+      .then(values => {
         this.appUIStoreManager.initializeUIStoreAction(values['login.authenticating']);
         this.authService
           .authenticateUser({
             username: event.user_name,
             password: event.user_password,
-            remeberMe: false
+            remeberMe: event.remember_me[0]
           })
           .then((res: AuthUser | ResponseErrorBag | null) => {
             // 502 : Bad request response returned from server
             if (res instanceof ResponseErrorBag) {
               this.appUIStoreManager.completeActionWithWarning(values.invalidRequestParams);
+              return;
             }
             // User is authenticated successfully
             if (res instanceof User) {
               // Navigate to dashboard
               this.router.navigate([this.route.snapshot.data.dashboardPath]);
               this.appUIStoreManager.completeUIStoreAction();
+              return;
             }
             // The res is null, could not authenticate user
             if (res === null) {
