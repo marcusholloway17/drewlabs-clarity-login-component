@@ -14,7 +14,6 @@ import { AuthenticationService } from 'src/app/lib/application/services/identity
 import { User } from 'src/app/lib/domain/auth/models/user';
 import { Router, ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
-// import { AppRoutes } from '../routes-definitions';
 import { IFormParentComponent } from 'src/app/lib/domain/helpers/component-interfaces';
 import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
 import { TranslationService } from '../../domain/translator/translator.service';
