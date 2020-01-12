@@ -60,6 +60,7 @@ export class LoginViewComponent implements OnInit, OnDestroy {
         this.appUIStoreManager.completeActionWithError(translation);
         setTimeout(() => {
           this.appUIStoreManager.resetUIStore();
+          this.cache.delete(HttpRequestConfigs.sessionExpiredStorageKey);
         }, 3000);
       });
     }
