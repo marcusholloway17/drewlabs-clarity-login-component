@@ -78,24 +78,24 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
             },
             minLength: 6,
             value: environment.testUserPassword
-          } as PasswordInput,
-          {
-            label: '',
-            type: InputTypes.CHECKBOX_INPUT,
-            placeholder: '',
-            formControlName: 'remember_me',
-            rules: {
-              isRequired: false,
-            },
-            value: true,
-            items: [
-              {
-                value: 1,
-                checked: true,
-                description: values['login.rememberMe']
-              }
-            ]
-          } as CheckBoxInput
+          } as PasswordInput
+          // {
+          //   label: '',
+          //   type: InputTypes.CHECKBOX_INPUT,
+          //   placeholder: '',
+          //   formControlName: 'remember_me',
+          //   rules: {
+          //     isRequired: false,
+          //   },
+          //   value: true,
+          //   items: [
+          //     {
+          //       value: 1,
+          //       checked: true,
+          //       description: values['login.rememberMe']
+          //     }
+          //   ]
+          // } as CheckBoxInput
         ];
         // Initialise child component input properties manually
         this.childView.controlConfigs = this.loginInputsConfig;
@@ -118,8 +118,7 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
         this.authService
           .authenticateUser({
             username: event.user_name,
-            password: event.user_password,
-            remeberMe: event.remember_me[0]
+            password: event.user_password
           })
           .then((res: AuthUser | ResponseErrorBag | null) => {
             // 502 : Bad request response returned from server
