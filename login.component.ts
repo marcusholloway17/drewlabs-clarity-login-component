@@ -17,6 +17,7 @@ import { environment } from 'src/environments/environment';
 import { IFormParentComponent } from 'src/app/lib/domain/helpers/component-interfaces';
 import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
 import { TranslationService } from '../../domain/translator/translator.service';
+import { isDefined } from '../../domain/utils/type-utils';
 
 @Component({
   selector: 'app-login',
@@ -110,7 +111,8 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
         'login.authenticationFailed',
         'login.authenticating',
         'invalidRequestParams',
-        'serverRequestFailed'
+        'serverRequestFailed',
+        'unauthorizedAccess'
       ])
       .toPromise()
       .then(values => {
@@ -129,6 +131,12 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
             }
             // User is authenticated successfully
             if (res instanceof User) {
+              if (isDefined(this.route.snapshot.data.modulePermissions)
+                && !((res as User).canAny(this.route.snapshot.data.modulePermissions))) {
+                this.authService.logoutUser();
+                this.appUIStoreManager.completeActionWithError(values.unauthorizedAccess);
+                return;
+              }
               // Navigate to dashboard
               this.router.navigate([this.route.snapshot.data.dashboardPath]);
               this.appUIStoreManager.completeUIStoreAction();
