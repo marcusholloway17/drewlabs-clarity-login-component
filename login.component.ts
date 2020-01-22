@@ -17,6 +17,7 @@ import { environment } from 'src/environments/environment';
 import { IFormParentComponent } from 'src/app/lib/domain/helpers/component-interfaces';
 import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
 import { TranslationService } from '../../domain/translator/translator.service';
+import { isDefined } from '../../domain/utils/type-utils';
 
 @Component({
   selector: 'app-login',
@@ -78,24 +79,7 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
             },
             minLength: 6,
             value: environment.testUserPassword
-          } as PasswordInput
-          // {
-          //   label: '',
-          //   type: InputTypes.CHECKBOX_INPUT,
-          //   placeholder: '',
-          //   formControlName: 'remember_me',
-          //   rules: {
-          //     isRequired: false,
-          //   },
-          //   value: true,
-          //   items: [
-          //     {
-          //       value: 1,
-          //       checked: true,
-          //       description: values['login.rememberMe']
-          //     }
-          //   ]
-          // } as CheckBoxInput
+          } as PasswordInput,
         ];
         // Initialise child component input properties manually
         this.childView.controlConfigs = this.loginInputsConfig;
@@ -110,7 +94,8 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
         'login.authenticationFailed',
         'login.authenticating',
         'invalidRequestParams',
-        'serverRequestFailed'
+        'serverRequestFailed',
+        'unauthorizedAccess'
       ])
       .toPromise()
       .then(values => {
@@ -118,7 +103,7 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
         this.authService
           .authenticateUser({
             username: event.user_name,
-            password: event.user_password
+            password: event.user_password,
           })
           .then((res: AuthUser | ResponseErrorBag | null) => {
             // 502 : Bad request response returned from server
@@ -128,6 +113,12 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
             }
             // User is authenticated successfully
             if (res instanceof User) {
+              if (isDefined(this.route.snapshot.data.modulePermissions)
+                && !((res as User).canAny(this.route.snapshot.data.modulePermissions))) {
+                this.authService.logoutUser();
+                this.appUIStoreManager.completeActionWithError(values.unauthorizedAccess);
+                return;
+              }
               // Navigate to dashboard
               this.router.navigate([this.route.snapshot.data.dashboardPath]);
               this.appUIStoreManager.completeUIStoreAction();
