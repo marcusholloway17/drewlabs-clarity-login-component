@@ -10,7 +10,7 @@
                     <h5 class="hint" [translate]="'login.loginSubText'"></h5>
                 </div>
                 <div class="form form-container" *ngIf="componentFormGroup">
-                    <app-alert *ngIf="alertProperties.showAlert" [alertType]="alertProperties.type" [alertMessage]="actionUiMessage" [showIcon]="true"></app-alert>
+                    <app-alert *ngIf="false" [alertType]="alertProperties.type" [alertMessage]="actionUiMessage" [showIcon]="true"></app-alert>
                     <ng-container *ngFor="let value of controlConfigs">
                         <app-dynamic-inputs [control]="componentFormGroup.controls[value.formControlName]" [inputConfig]="value"></app-dynamic-inputs>
                     </ng-container>
