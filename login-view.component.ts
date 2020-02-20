@@ -18,12 +18,19 @@ import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manag
 import { TranslationService } from 'src/app/lib/domain/translator/translator.service';
 import { ComponentReactiveFormHelpers } from 'src/app/lib/domain/helpers/component-reactive-form-helpers';
 
+// declare the variable require to use ad image path
+declare var require: any;
+
 @Component({
   selector: 'app-login-view',
   templateUrl: './login-view.component.html',
   styleUrls: ['./login-view.component.css']
 })
 export class LoginViewComponent implements OnInit, OnDestroy {
+
+  public elewouLogo = require('../partials/assets/images/logo-elewou-main.png');
+  public elewouIcon = require('../partials/assets/images/icon-elewou.png');
+
   public componentFormGroup: FormGroup;
   @Input() controlConfigs: IHTMLFormControl[];
   @Output() formSubmitted: EventEmitter<object> = new EventEmitter<object>();
