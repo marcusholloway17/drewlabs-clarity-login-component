@@ -16,6 +16,7 @@ import { HttpRequestConfigs } from 'src/app/lib/domain/http/core';
 import { isDefined } from 'src/app/lib/domain/utils/type-utils';
 import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
 import { TranslationService } from 'src/app/lib/domain/translator/translator.service';
+import { DynamicControlParser } from 'src/app/lib/domain/helpers/dynamic-control-parser';
 import { ComponentReactiveFormHelpers } from 'src/app/lib/domain/helpers/component-reactive-form-helpers';
 
 // declare the variable require to use ad image path
@@ -44,6 +45,7 @@ export class LoginViewComponent implements OnInit, OnDestroy {
    */
   constructor(
     private builder: FormBuilder,
+    private controlsParser: DynamicControlParser,
     public appUIStoreManager: AppUIStoreManager,
     public cache: SessionStorage,
     public translate: TranslationService
@@ -74,8 +76,7 @@ export class LoginViewComponent implements OnInit, OnDestroy {
   }
 
   buildForm(): AbstractControl {
-    return ComponentReactiveFormHelpers.buildFormGroupFromInputConfig(
-      this.builder,
+    return this.controlsParser.buildFormGroupFromInputConfig(
       this.controlConfigs
     );
   }
