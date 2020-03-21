@@ -38,8 +38,7 @@ export class LoginViewComponent implements OnInit, OnDestroy {
   performingAction: boolean;
   actionUiMessage: string;
   uiStoreSubscriptions: Subscription[] = [];
-
-  @Input() moduleName: string;
+  @Input() public moduleName = 'Module name';
 
   /**
    * @description Component object instance initializer
