@@ -38,6 +38,9 @@ export class LoginViewComponent implements OnInit, OnDestroy {
   performingAction: boolean;
   actionUiMessage: string;
   uiStoreSubscriptions: Subscription[] = [];
+
+  @Input() moduleName: string;
+
   /**
    * @description Component object instance initializer
    * @param builder [[FormBuilder]] Angular ReactiveForm FormBuilder

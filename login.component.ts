@@ -6,8 +6,7 @@ import {
   InputTypes,
   IHTMLFormControl,
   TextInput,
-  PasswordInput,
-  CheckBoxInput
+  PasswordInput
 } from 'src/app/lib/domain/components/dynamic-inputs/core';
 import { LoginViewComponent } from './login-view.component';
 import { AuthenticationService } from 'src/app/lib/application/services/identity/authentication.service';
@@ -25,6 +24,7 @@ import { isDefined } from '../../domain/utils/type-utils';
     <app-login-view
       [controlConfigs]="loginInputsConfig"
       (formSubmitted)="onChildComponentFormSubmitted($event)"
+      [moduleName]="moduleName"
       #childView
     ></app-login-view>
   `
@@ -32,6 +32,7 @@ import { isDefined } from '../../domain/utils/type-utils';
 export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
   @ViewChild('childView', { static: true }) childView: LoginViewComponent;
   public loginInputsConfig: IHTMLFormControl[] = [];
+  public moduleName: string;
 
   constructor(
     private translate: TranslationService,
@@ -42,6 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
   ) { }
 
   ngOnInit() {
+    this.moduleName = this.route.snapshot.data.moduleName;
     this.translate
       .translate(['login.username', 'login.password', 'login.rememberMe'])
       .toPromise()

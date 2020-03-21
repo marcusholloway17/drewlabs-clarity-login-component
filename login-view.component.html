@@ -8,6 +8,7 @@
             <img [src]="elewouLogo" alt="ELEWOU" />
           </div>
           <h5 class="hint" [translate]="'login.loginSubText'"></h5>
+          <pre>{{ moduleName }}</pre>
         </div>
         <div class="form form-container" *ngIf="componentFormGroup">
           <ng-container *ngFor="let value of controlConfigs">
