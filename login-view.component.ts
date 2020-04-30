@@ -29,8 +29,8 @@ declare var require: any;
 })
 export class LoginViewComponent implements OnInit, OnDestroy {
 
-  public elewouLogo = require('../partials/assets/images/logo-elewou-main.png');
-  public elewouIcon = require('../partials/assets/images/icon-elewou.png');
+  public elewouLogo = '/assets/images/logo-elewou-main.png';
+  // public elewouIcon = '/assets/images/icon-elewou.png';
 
   public componentFormGroup: FormGroup;
   @Input() controlConfigs: IHTMLFormControl[];
