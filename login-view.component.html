@@ -1,0 +1,26 @@
+<div class="login-wrapper">
+  <!-- <app-progress-bar [indeterminate]=true [hidden]="!performingAction" [overlay]="true"></app-progress-bar> -->
+  <div class="login-overlay" *ngIf="componentFormGroup">
+    <form class="login clr-form" [formGroup]="componentFormGroup" (ngSubmit)="onFormSubmit()">
+      <div class="login-group">
+        <div class="title">
+          <div class="login-logo">
+            <img [src]="elewouLogo" alt="ELEWOU" />
+          </div>
+          <span class="module-name"> {{ moduleName }} </span>
+          <h5 class="hint" [translate]="'login.loginSubText'"></h5>
+        </div>
+        <div class="form form-container" *ngIf="componentFormGroup">
+          <ng-container *ngFor="let value of controlConfigs">
+            <app-dynamic-inputs [control]="componentFormGroup.controls[value.formControlName]" [inputConfig]="value">
+            </app-dynamic-inputs>
+          </ng-container>
+          <button type="submit" class="btn btn-primary btn-block"><clr-icon shape="login"></clr-icon>{{ "login.loginBtnText" | translate }}</button>
+        </div>
+        <div class="app-login-footer">
+          <div class="app-login-logo-description">Powered by LIKSOFT</div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
