@@ -132,6 +132,7 @@ export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
             }
           })
           .catch(err => {
+            console.log(err);
             // Handle exception rejected from the request
             this.appUIStoreManager.completeActionWithError(values.serverRequestFailed);
           });
