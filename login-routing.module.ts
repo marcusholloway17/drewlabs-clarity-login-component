@@ -17,8 +17,9 @@ const LOGIN_ROUTES = [
   declarations: [],
   providers: []
 })
-export class LoginRoutingModule {}
+export class LoginRoutingModule { }
 
 export const LOGIN_NAVIGATION_COMPONENTS = [
-  LoginComponent, LoginViewComponent
+  LoginComponent,
+  LoginViewComponent
 ];

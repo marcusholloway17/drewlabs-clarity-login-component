@@ -1,145 +1,113 @@
-import { ResponseErrorBag } from 'src/app/lib/domain/http/contracts/http-response-data';
-import { AuthUser } from 'src/app/lib/domain/auth/contracts/user';
-import { FormGroup } from '@angular/forms';
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import {
-  InputTypes,
-  IHTMLFormControl,
-  TextInput,
-  PasswordInput
-} from 'src/app/lib/domain/components/dynamic-inputs/core';
-import { LoginViewComponent } from './login-view.component';
-import { AuthenticationService } from 'src/app/lib/application/services/identity/authentication.service';
-import { User } from 'src/app/lib/domain/auth/models/user';
-import { Router, ActivatedRoute } from '@angular/router';
-import { environment } from 'src/environments/environment';
-import { IFormParentComponent } from 'src/app/lib/domain/helpers/component-interfaces';
-import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
-import { TranslationService } from '../../domain/translator/translator.service';
-import { isDefined } from '../../domain/utils/type-utils';
+import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { mergeMap, takeUntil, withLatestFrom, tap, filter, map } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { TRANSLATIONS, buildLoginFormControlObj } from './constants';
+import { TranslationService } from '../../domain/translator';
+import { AppUIStateProvider } from '../../domain/ui-store';
+import { AuthService } from '../../domain/auth/core';
+import { SessionStorage } from '../../domain/storage/core';
+import { UIStateStatusCode } from '../../domain/helpers/app-ui-store-manager.service';
+import { observaleOf } from '../../domain/rxjs/helpers';
+import { HttpRequestConfigs } from 'src/app/lib/domain/http/core';
+import { isDefined } from 'src/app/lib/domain/utils';
+import { doLog } from '../../domain/rxjs/operators';
+import { AppUser, userCanAny } from '../../domain/auth/contracts/v2';
+import { IHTMLFormControl } from 'src/app/lib/domain/components/dynamic-inputs/core';
+export interface ComponentState {
+  translations: { [index: string]: any };
+  controlConfigs: IHTMLFormControl[];
+  performingAction: boolean;
+}
 
 @Component({
   selector: 'app-login',
   template: `
+    <!-- <app-login-notification [authorizations]="route.snapshot?.data?.modulePermissions"></app-login-notification> -->
+    <ng-container *ngIf="loginViewState$ | async  as state">
     <app-login-view
-      [controlConfigs]="loginInputsConfig"
+      [controlConfigs]="state.controlConfigs"
+      [performingAction]="state.performingAction"
       (formSubmitted)="onChildComponentFormSubmitted($event)"
-      [moduleName]="moduleName"
-      #childView
+      (loadRegistrationViewEvent)="router.navigateByUrl('/register')"
     ></app-login-view>
-  `
+    </ng-container>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LoginComponent implements OnInit, OnDestroy, IFormParentComponent {
-  @ViewChild('childView', { static: true }) childView: LoginViewComponent;
-  public loginInputsConfig: IHTMLFormControl[] = [];
-  public moduleName: string;
+export class LoginComponent implements OnDestroy {
+  private destroy$ = new Subject<{}>();
+
+  // Load translations
+  translations$ = this.translate
+    .translate(TRANSLATIONS);
+  loginViewState$ = this.uiState.uiState
+    .pipe(
+      withLatestFrom(this.translations$),
+      mergeMap(([uiState, source]) => observaleOf({
+        controlConfigs: buildLoginFormControlObj(source),
+        performingAction: uiState.performingAction
+      })),
+    );
+  loginState$ = this.auth.state$.pipe(
+    map(state => {
+      if (state.authenticating) {
+        this.uiState.startAction();
+      } else if (!state.isInitialState) {
+        this.uiState.endAction('', state.isLoggedIn ? UIStateStatusCode.AUTHENTICATED : UIStateStatusCode.UNAUTHENTICATED);
+      }
+      return state;
+    })
+  );
 
   constructor(
     private translate: TranslationService,
-    private authService: AuthenticationService,
-    private appUIStoreManager: AppUIStoreManager,
-    private router: Router,
-    private route: ActivatedRoute
-  ) { }
-
-  ngOnInit() {
-    this.moduleName = this.route.snapshot.data.moduleName;
-    this.translate
-      .translate(['login.username', 'login.password', 'login.rememberMe'])
-      .toPromise()
-      .then(values => {
-        const username: string = values['login.username']
-          ? values['login.username']
-          : 'Identifiant';
-        const password: string = values['login.password']
-          ? values['login.password']
-          : 'Mot de passe';
-        this.loginInputsConfig = [
-          {
-            label: username,
-            type: InputTypes.TEXT_INPUT,
-            placeholder: username,
-            formControlName: 'user_name',
-            classes: 'clr-input',
-            rules: {
-              isRequired: true,
-              maxLength: true
-            },
-            maxLength: 100,
-            value: environment.testUser
-          } as TextInput,
-          {
-            label: password,
-            type: InputTypes.PASSWORD_INPUT,
-            placeholder: password,
-            formControlName: 'user_password',
-            classes: 'clr-input',
-            pattern: '((?=[a-zA-Z]*)(?=d*)(?=[~!@#$%^&*()/-_]*).{6,})',
-            rules: {
-              isRequired: true,
-              pattern: true
-            },
-            minLength: 6,
-            value: environment.testUserPassword
-          } as PasswordInput,
-        ];
-        // Initialise child component input properties manually
-        this.childView.controlConfigs = this.loginInputsConfig;
-        // Build the form group
-        this.childView.componentFormGroup = this.childView.buildForm() as FormGroup;
+    private uiState: AppUIStateProvider,
+    public route: ActivatedRoute,
+    private auth: AuthService,
+    public readonly router: Router,
+    cache: SessionStorage
+  ) {
+    // Component state observale
+    // Checks for session expiration
+    if (isDefined(cache.get(HttpRequestConfigs.sessionExpiredStorageKey))) {
+      this.translations$.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(translations => {
+        this.uiState.endAction(translations.sessionExpired, UIStateStatusCode.UNAUTHORIZED);
+        setTimeout(() => {
+          this.uiState.endAction();
+          cache.delete(HttpRequestConfigs.sessionExpiredStorageKey);
+        }, 3000);
       });
+    }
+
+    // Set login state
+    this.loginState$.pipe(
+      takeUntil(this.destroy$),
+      filter(state => !state.authenticating && isDefined(state.isInitialState)),
+      doLog('Logging state in loggin component: '),
+      tap(state => {
+        if (state.isLoggedIn) {
+          // Checks if user has permission provided to the login component
+          if (!(state.user && (state.user instanceof AppUser) && isDefined(this.route.snapshot.data.modulePermissions)
+            && !(userCanAny(state.user, this.route.snapshot.data.modulePermissions)))) {
+            // Navigate to dashboard
+            setTimeout(() => {
+              this.router.navigateByUrl(`/${this.route.snapshot.data.dashboardPath}`);
+            }, 1000);
+          }
+        }
+      }),
+    ).subscribe();
+    // End Checks for auth expiration
   }
 
-  onChildComponentFormSubmitted(event: any) {
-    this.translate
-      .translate([
-        'login.authenticationFailed',
-        'login.authenticating',
-        'invalidRequestParams',
-        'serverRequestFailed',
-        'unauthorizedAccess'
-      ])
-      .toPromise()
-      .then(values => {
-        this.appUIStoreManager.initializeUIStoreAction(values['login.authenticating']);
-        this.authService
-          .authenticateUser({
-            username: event.user_name,
-            password: event.user_password,
-          })
-          .then((res: AuthUser | ResponseErrorBag | null) => {
-            // 502 : Bad request response returned from server
-            if (res instanceof ResponseErrorBag) {
-              this.appUIStoreManager.completeActionWithWarning(values.invalidRequestParams);
-              return;
-            }
-            // User is authenticated successfully
-            if (res instanceof User) {
-              if (isDefined(this.route.snapshot.data.modulePermissions)
-                && !((res as User).canAny(this.route.snapshot.data.modulePermissions))) {
-                this.authService.logoutUser();
-                this.appUIStoreManager.completeActionWithError(values.unauthorizedAccess);
-                return;
-              }
-              // Navigate to dashboard
-              this.router.navigate([this.route.snapshot.data.dashboardPath]);
-              this.appUIStoreManager.completeUIStoreAction();
-              return;
-            }
-            // The res is null, could not authenticate user
-            if (res === null) {
-              this.appUIStoreManager.completeActionWithError(values['login.authenticationFailed']);
-            }
-          })
-          .catch(err => {
-            console.log(err);
-            // Handle exception rejected from the request
-            this.appUIStoreManager.completeActionWithError(values.serverRequestFailed);
-          });
-      });
+  async onChildComponentFormSubmitted(event: any) {
+    // Start the UiState action
+    this.uiState.startAction();
+    await this.auth.authenticate(Object.assign({}, event)).toPromise();
   }
 
-  ngOnDestroy() {
-    this.appUIStoreManager.resetUIStore();
-  }
+  ngOnDestroy = () => this.destroy$.next();
 }
