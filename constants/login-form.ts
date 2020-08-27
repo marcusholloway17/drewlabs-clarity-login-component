@@ -1,4 +1,4 @@
-import { InputTypes, TextInput, PasswordInput, IHTMLFormControl } from 'src/app/lib/components/dynamic-inputs/core';
+import { IHTMLFormControl, InputTypes, PasswordInput, TextInput } from 'src/app/lib/domain/components/dynamic-inputs/core';
 
 type ConfigsBuilderFn = (
   translations: {

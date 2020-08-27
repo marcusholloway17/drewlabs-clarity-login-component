@@ -4,15 +4,14 @@ import { mergeMap, takeUntil, withLatestFrom, tap, filter, map } from 'rxjs/oper
 import { Subject } from 'rxjs';
 import { TRANSLATIONS, buildLoginFormControlObj } from './constants';
 import { TranslationService } from '../../domain/translator';
-import { AppUIStateProvider } from '../../domain/ui-store';
 import { AuthService } from '../../domain/auth/core';
 import { SessionStorage } from '../../domain/storage/core';
-import { UIStateStatusCode } from '../../domain/helpers/app-ui-store-manager.service';
-import { observaleOf } from '../../domain/rxjs/helpers';
+import { AppUIStateProvider, UIStateStatusCode } from '../../domain/helpers';
+import { observableOf } from '../../domain/rxjs/helpers';
 import { HttpRequestConfigs } from 'src/app/lib/domain/http/core';
 import { isDefined } from 'src/app/lib/domain/utils';
 import { doLog } from '../../domain/rxjs/operators';
-import { AppUser, userCanAny } from '../../domain/auth/contracts/v2';
+import { User, userCanAny } from '../../domain/auth/contracts/v2';
 import { IHTMLFormControl } from 'src/app/lib/domain/components/dynamic-inputs/core';
 export interface ComponentState {
   translations: { [index: string]: any };
@@ -23,13 +22,13 @@ export interface ComponentState {
 @Component({
   selector: 'app-login',
   template: `
-    <!-- <app-login-notification [authorizations]="route.snapshot?.data?.modulePermissions"></app-login-notification> -->
     <ng-container *ngIf="loginViewState$ | async  as state">
     <app-login-view
       [controlConfigs]="state.controlConfigs"
       [performingAction]="state.performingAction"
       (formSubmitted)="onChildComponentFormSubmitted($event)"
       (loadRegistrationViewEvent)="router.navigateByUrl('/register')"
+      [moduleName]="moduleName"
     ></app-login-view>
     </ng-container>
   `,
@@ -37,23 +36,25 @@ export interface ComponentState {
 })
 export class LoginComponent implements OnDestroy {
   private destroy$ = new Subject<{}>();
-
+  moduleName = this.route.snapshot.data.moduleName;
   // Load translations
   translations$ = this.translate
     .translate(TRANSLATIONS);
+
   loginViewState$ = this.uiState.uiState
     .pipe(
       withLatestFrom(this.translations$),
-      mergeMap(([uiState, source]) => observaleOf({
+      mergeMap(([uiState, source]) => observableOf({
         controlConfigs: buildLoginFormControlObj(source),
         performingAction: uiState.performingAction
       })),
     );
+
   loginState$ = this.auth.state$.pipe(
     map(state => {
       if (state.authenticating) {
         this.uiState.startAction();
-      } else if (!state.isInitialState) {
+      } else if (isDefined(state.isInitialState) && !state.isInitialState) {
         this.uiState.endAction('', state.isLoggedIn ? UIStateStatusCode.AUTHENTICATED : UIStateStatusCode.UNAUTHENTICATED);
       }
       return state;
@@ -90,7 +91,7 @@ export class LoginComponent implements OnDestroy {
       tap(state => {
         if (state.isLoggedIn) {
           // Checks if user has permission provided to the login component
-          if (!(state.user && (state.user instanceof AppUser) && isDefined(this.route.snapshot.data.modulePermissions)
+          if (!(state.user && (state.user instanceof User) && isDefined(this.route.snapshot.data.modulePermissions)
             && !(userCanAny(state.user, this.route.snapshot.data.modulePermissions)))) {
             // Navigate to dashboard
             setTimeout(() => {
@@ -103,6 +104,7 @@ export class LoginComponent implements OnDestroy {
     // End Checks for auth expiration
   }
 
+  // tslint:disable-next-line: typedef
   async onChildComponentFormSubmitted(event: any) {
     // Start the UiState action
     this.uiState.startAction();

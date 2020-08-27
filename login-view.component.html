@@ -1,7 +1,6 @@
-<div class="login-wrapper">
-  <!-- <app-progress-bar [indeterminate]=true [hidden]="!performingAction" [overlay]="true"></app-progress-bar> -->
-  <div class="login-overlay" *ngIf="componentFormGroup">
-    <form class="login clr-form" [formGroup]="componentFormGroup" (ngSubmit)="onFormSubmit()">
+<div class="login-wrapper" *ngIf="componentFormGroup$ | async as componentFormGroup">
+  <div class="login-overlay">
+    <form class="login clr-form" #loginForm="ngForm" [formGroup]="componentFormGroup" (ngSubmit)="onFormSubmit(componentFormGroup)">
       <div class="login-group">
         <div class="title">
           <div class="login-logo">

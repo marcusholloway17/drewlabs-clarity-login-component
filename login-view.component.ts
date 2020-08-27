@@ -2,7 +2,7 @@ import { FormGroup, AbstractControl, NgForm } from '@angular/forms';
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IHTMLFormControl } from '../../domain/components/dynamic-inputs/core';
-import { observaleOf } from '../../domain/rxjs/helpers';
+import { observableOf } from '../../domain/rxjs/helpers';
 import { ComponentReactiveFormHelpers } from '../../domain/helpers/component-reactive-form-helpers';
 import { DynamicControlParser } from '../../domain/helpers/dynamic-control-parser';
 
@@ -19,6 +19,7 @@ export class LoginViewComponent {
 
   // tslint:disable-next-line: variable-name
   private _componentFormGroup$ = new Observable<FormGroup>();
+  // tslint:disable-next-line: typedef
   get componentFormGroup$() {
     return this._componentFormGroup$;
   }
@@ -27,8 +28,9 @@ export class LoginViewComponent {
   private _controlConfigs: IHTMLFormControl[];
   @Input() set controlConfigs(value: IHTMLFormControl[]) {
     this._controlConfigs = value;
-    this._componentFormGroup$ = observaleOf(this.buildForm() as FormGroup);
+    this._componentFormGroup$ = observableOf(this.buildForm() as FormGroup);
   }
+  // tslint:disable-next-line: typedef
   get controlConfigs() {
     return this._controlConfigs;
   }
@@ -54,7 +56,7 @@ export class LoginViewComponent {
     );
   }
 
-  onFormSubmit(formGroup: FormGroup) {
+  onFormSubmit = (formGroup: FormGroup) =>  {
     // Mark componentFormGroup controls as touched
     ComponentReactiveFormHelpers.validateFormGroupFields(
       formGroup
@@ -66,7 +68,7 @@ export class LoginViewComponent {
     }
   }
 
-  onNavigateToRegistrationView() {
+  onNavigateToRegistrationView = () => {
     this.loadRegistrationViewEvent.emit(true);
   }
 }

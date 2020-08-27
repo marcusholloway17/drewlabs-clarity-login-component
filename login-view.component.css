@@ -1,89 +1,63 @@
-/* .app-login-wrapper {
-  height: 100vh;
-  background-image: url("../../../assets/img/login-bg.jpg");
-  background-size: cover;
-  position: relative;
-
-} */
-.app-login-overlay {
-  position: relative;
-  height: inherit;
-  background: rgba(6, 56, 97, 0.81);
+.login-wrapper {
+  background-position: 0;
 }
 
-form.app-login-form {
-  position: relative;
-  padding: 0;
+.login-wrapper .login:after {
+  background: transparent;
 }
 
-/* .card.login-card {
-  margin: 0 auto;
-  height: 100vh;
-  width: 400px;
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0px 1px 13px 5px #3c3c3c6f;
-}
-
-.card-body {
-  padding: 1rem;
-} */
-
-.login-submit {
-  margin: 2.8rem 0 0 0 !important;
-}
-
-.login-card .card-header {
-  font-size: 1rem;
-  line-height: 1.4;
-}
-
-.card-section {
+.app-login-logo-description {
+  padding: .5em .3em;
+  text-align: center;
+  font-size: 0.5rem;
   margin-top: 1rem;
 }
 
-.btn clr-icon {margin-right: 10px;}
-
-img.img-login {
-  margin-top: 2.88rem;
-  margin-bottom: 1rem;
-  border-radius: 11px;
-  height: 140px;
-  width: 140px;
+.login-wrapper .login .login-group .btn {
+  margin: 2rem 0 0;
+  max-width: none;
 }
 
-.btn.btn-app, .btn-app .btn {
-  border-color: rgb(239, 142, 0);
-  background-color: rgb(239, 142, 0);
+.login-overlay {
+  position: relative;
+  background: rgba(12, 56, 80, 0.88);
+  width: 100%;
 }
 
-/* .login-wrapper {
-  display: flex;
-  height: 100%;
-  background: url("../../../assets/img/login-bg.jpg");
-  background-size: 100%;
-  background-position: 25.2rem 0;
-  background-repeat: no-repeat;
-} */
-
-.text-quote {
-  font-weight: 400;
-  line-height: 25px;
-  width: 215px;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  margin: 35px;
-  margin-bottom: 45px;
-  text-align: right;
+form.login.clr-form {
+  margin: 0 auto;
+  background: transparent;
 }
 
-.text-quote .quote {
-  font-size: .7rem;
-  margin-bottom: 12px;
-  color: #fff;
+form .login-group {
+  background: white;
+  padding: 24px 27px;
+  border-radius: 8px;
 }
 
-.text-quote .author {
-  font-size: .7rem;
-  color: rgb(239, 142, 0);
+.title {
+  text-align: center;
+}
+
+.login-logo {
+  position: relative;
+  max-width: 100%;
+}
+
+.login-logo img {
+  position: relative;
+  width: 60%;
+  max-width: 100%;
+}
+
+.login-wrapper .login .title .hint {
+font-size: 10px;
+margin-bottom: 1rem;
+color: #656d71;
+}
+
+.module-name {
+color: rgb(38, 33, 21);
+font-size: 20px;
+font-weight: 700;
 }
