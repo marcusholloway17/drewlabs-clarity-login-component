@@ -5,6 +5,7 @@ import { IHTMLFormControl } from '../../domain/components/dynamic-inputs/core';
 import { observableOf } from '../../domain/rxjs/helpers';
 import { ComponentReactiveFormHelpers } from '../../domain/helpers/component-reactive-form-helpers';
 import { DynamicControlParser } from '../../domain/helpers/dynamic-control-parser';
+import { Log } from '../../domain/utils/logger';
 
 @Component({
   selector: 'app-login-view',

@@ -25,7 +25,7 @@ export interface ComponentState {
     <ng-container *ngIf="loginViewState$ | async  as state">
     <app-login-view
       [controlConfigs]="state.controlConfigs"
-      [performingAction]="state.performingAction"
+      [performingAction]="(uiState$ | async)?.performingAction"
       (formSubmitted)="onChildComponentFormSubmitted($event)"
       (loadRegistrationViewEvent)="router.navigateByUrl('/register')"
       [moduleName]="moduleName"
@@ -39,16 +39,17 @@ export class LoginComponent implements OnDestroy {
   moduleName = this.route.snapshot.data.moduleName;
   // Load translations
   translations$ = this.translate
-    .translate(TRANSLATIONS);
+    .translate(TRANSLATIONS).pipe(
+      doLog('Translations loaded....')
+    );
 
-  loginViewState$ = this.uiState.uiState
+  loginViewState$ = this.translations$
     .pipe(
-      withLatestFrom(this.translations$),
-      mergeMap(([uiState, source]) => observableOf({
+      mergeMap(source => observableOf({
         controlConfigs: buildLoginFormControlObj(source),
-        performingAction: uiState.performingAction
       })),
     );
+  uiState$ =  this.uiState.uiState;
 
   loginState$ = this.auth.state$.pipe(
     map(state => {
