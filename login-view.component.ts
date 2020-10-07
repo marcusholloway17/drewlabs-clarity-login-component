@@ -41,7 +41,7 @@ export class LoginViewComponent {
   // tslint:disable-next-line: no-inferrable-types
   @Input() loggedIn: boolean = false;
 
-  @ViewChild('loginForm', {static: false}) loginForm: NgForm;
+  @ViewChild('loginForm') loginForm: NgForm;
 
   @Input() public moduleName = 'Module name';
   public elewouLogo = '/assets/images/logo-elewou-main.png';
