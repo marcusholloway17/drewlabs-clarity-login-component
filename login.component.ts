@@ -82,6 +82,8 @@ export class LoginComponent implements OnDestroy {
           cache.delete(HttpRequestConfigs.sessionExpiredStorageKey);
         }, 3000);
       });
+    } else {
+      this.uiState.endAction();
     }
 
     // Set login state
