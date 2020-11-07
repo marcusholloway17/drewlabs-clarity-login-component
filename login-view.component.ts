@@ -1,11 +1,9 @@
 import { FormGroup, AbstractControl, NgForm } from '@angular/forms';
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs';
 import { IHTMLFormControl } from '../../domain/components/dynamic-inputs/core';
-import { observableOf } from '../../domain/rxjs/helpers';
+import { createStateful } from '../../domain/rxjs/helpers';
 import { ComponentReactiveFormHelpers } from '../../domain/helpers/component-reactive-form-helpers';
 import { DynamicControlParser } from '../../domain/helpers/dynamic-control-parser';
-import { Log } from '../../domain/utils/logger';
 
 @Component({
   selector: 'app-login-view',
@@ -19,17 +17,17 @@ export class LoginViewComponent {
   @Output() loadRegistrationViewEvent = new EventEmitter<boolean>();
 
   // tslint:disable-next-line: variable-name
-  private _componentFormGroup$ = new Observable<FormGroup>();
+  private _componentFormGroup$ = createStateful<FormGroup>(null);
   // tslint:disable-next-line: typedef
   get componentFormGroup$() {
-    return this._componentFormGroup$;
+    return this._componentFormGroup$.asObservable();
   }
 
   // tslint:disable-next-line: variable-name
   private _controlConfigs: IHTMLFormControl[];
   @Input() set controlConfigs(value: IHTMLFormControl[]) {
     this._controlConfigs = value;
-    this._componentFormGroup$ = observableOf(this.buildForm() as FormGroup);
+    this._componentFormGroup$.next(this.buildForm() as FormGroup);
   }
   // tslint:disable-next-line: typedef
   get controlConfigs() {
