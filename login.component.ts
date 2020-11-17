@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { mergeMap, takeUntil, withLatestFrom, tap, filter, map } from 'rxjs/operators';
+import { mergeMap, takeUntil, tap, filter, map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { TRANSLATIONS, buildLoginFormControlObj } from './constants';
 import { TranslationService } from '../../domain/translator';
