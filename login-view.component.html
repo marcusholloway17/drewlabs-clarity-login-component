@@ -1,4 +1,4 @@
-<div class="login-wrapper" *ngIf="componentFormGroup$ | async as componentFormGroup">
+<div class="login-wrapper light-mode" *ngIf="componentFormGroup$ | async as componentFormGroup">
   <div class="login-overlay">
     <form class="login clr-form" #loginForm="ngForm" [formGroup]="componentFormGroup" (ngSubmit)="onFormSubmit(componentFormGroup)">
       <div class="login-group">
