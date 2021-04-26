@@ -7,7 +7,7 @@
             <img [src]="cnssLogo" alt="CNSS" />
           </div>
           <!-- <span class="module-name"> {{ moduleName }} </span> -->
-          <span class="module-name"> Connexion à votre compte </span>
+          <span class="module-name"> {{ "login.loginText" | translate }} </span>
           <!-- <h5 class="hint" [translate]="'login.loginSubText'"></h5> -->
         </div>
         <div class="form form-container" *ngIf="componentFormGroup">
@@ -20,9 +20,25 @@
       <div class="login-btn-container">
         <button type="submit" [disabled]="performingAction" class="btn btn-primary btn-block"><clr-icon shape="login"></clr-icon>{{ "login.loginBtnText" | translate }}</button>
       </div>
-      <!-- <div class="app-login-footer">
-        <div class="app-login-logo-description">Powered by LIKSOFT</div>
-      </div> -->
     </form>
+    <div class="login-sub-section">
+      <div class="registration-area">
+        <h5 class="registration-header">{{ "login.registerHintText" | translate }}</h5>
+        <div class="registration-btn-container">
+          <button class="btn btn-outline-app">
+            <clr-icon shape="login"></clr-icon>{{ "login.registerBtnText" | translate }}
+          </button>
+        </div>
+      </div>
+      <div class="app-login-footer">
+        <div class="company-infos">
+          <div class="company-motto">{{ "login.companyMottoText" | translate }}</div>
+          <div class="company-website">www.cnss.tg</div>
+        </div>
+        <div class="app-login-logo-description">
+          {{ "login.poweredByText" | translate }}
+        </div>
+      </div>
+    </div>
   </div>
 </div>
