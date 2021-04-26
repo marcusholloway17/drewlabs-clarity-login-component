@@ -37,6 +37,7 @@ export interface ComponentState {
 export class LoginComponent implements OnDestroy {
   private destroy$ = new Subject<{}>();
   moduleName = this.route.snapshot.data.moduleName;
+  loginHeadingText = this.route.snapshot.data.loginHeadingText;
   // Load translations
   translations$ = this.translate
     .translate(TRANSLATIONS).pipe(
