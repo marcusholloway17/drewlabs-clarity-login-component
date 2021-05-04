@@ -25,8 +25,8 @@
       <div class="registration-area">
         <h5 class="registration-header">{{ "login.registerHintText" | translate }}</h5>
         <div class="registration-btn-container">
-          <button class="btn btn-outline-app">
-            <clr-icon shape="login"></clr-icon>{{ "login.registerBtnText" | translate }}
+          <button class="btn btn-outline-app" (click)="viewRouter.navigateByUrl('register')">
+            <clr-icon shape="plus"></clr-icon>{{ "login.registerBtnText" | translate }}
           </button>
         </div>
       </div>

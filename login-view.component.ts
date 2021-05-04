@@ -4,6 +4,7 @@ import { IHTMLFormControl } from '../../core/components/dynamic-inputs/core';
 import { createStateful } from '../../core/rxjs/helpers';
 import { ComponentReactiveFormHelpers } from '../../core/helpers/component-reactive-form-helpers';
 import { DynamicControlParser } from '../../core/helpers/dynamic-control-parser';
+import { ComponentsRouterService } from '../components-router.service';
 
 @Component({
   selector: 'app-login-view',
@@ -47,7 +48,7 @@ export class LoginViewComponent {
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
    */
-  constructor(private controlsParser: DynamicControlParser) {}
+  constructor(private controlsParser: DynamicControlParser, public viewRouter: ComponentsRouterService ) {}
 
   buildForm(): AbstractControl {
     return this.controlsParser.buildFormGroupFromInputConfig(
