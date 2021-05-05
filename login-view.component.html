@@ -22,6 +22,10 @@
       </div>
     </form>
     <div class="login-sub-section">
+      <div class="password-forget">
+        <span>{{ "login.passwordForgetText" | translate }}</span>
+        <button (click)="viewRouter.navigateByUrl('password-forget')" class="btn-link btn btn-sm">Cliquez-ici</button>
+      </div>
       <div class="registration-area">
         <h5 class="registration-header">{{ "login.registerHintText" | translate }}</h5>
         <div class="registration-btn-container">
