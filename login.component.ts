@@ -6,13 +6,14 @@ import { TRANSLATIONS, buildLoginFormControlObj } from './constants';
 import { TranslationService } from '../../core/translator';
 import { AuthService } from '../../core/auth/core';
 import { SessionStorage } from '../../core/storage/core';
-import { AppUIStateProvider, UIStateStatusCode } from '../../core/helpers';
 import { observableOf } from '../../core/rxjs/helpers';
 import { HttpRequestConfigs } from 'src/app/lib/core/http/core';
 import { isDefined } from 'src/app/lib/core/utils';
 import { doLog } from '../../core/rxjs/operators';
 import { User, userCanAny } from '../../core/auth/contracts/v2';
 import { IHTMLFormControl } from 'src/app/lib/core/components/dynamic-inputs/core';
+import { AppUIStateProvider } from '../../core/ui-state';
+import { UIStateStatusCode } from '../../core/contracts/ui-state';
 export interface ComponentState {
   translations: { [index: string]: any };
   controlConfigs: IHTMLFormControl[];

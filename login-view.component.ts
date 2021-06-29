@@ -2,8 +2,8 @@ import { FormGroup, AbstractControl, NgForm } from '@angular/forms';
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { IHTMLFormControl } from '../../core/components/dynamic-inputs/core';
 import { createStateful } from '../../core/rxjs/helpers';
-import { ComponentReactiveFormHelpers } from '../../core/helpers/component-reactive-form-helpers';
 import { DynamicControlParser } from '../../core/helpers/dynamic-control-parser';
+import { ComponentReactiveFormHelpers } from '../../core/components/dynamic-inputs/angular';
 
 @Component({
   selector: 'app-login-view',
