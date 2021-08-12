@@ -1,19 +1,24 @@
-import { FormGroup, AbstractControl, NgForm } from '@angular/forms';
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ViewChild } from '@angular/core';
-import { IHTMLFormControl } from '../../core/components/dynamic-inputs/core';
-import { createStateful } from '../../core/rxjs/helpers';
-import { DynamicControlParser } from '../../core/helpers/dynamic-control-parser';
-import { ComponentsRouterService } from '../components-router.service';
-import { ComponentReactiveFormHelpers } from '../../core/components/dynamic-inputs/angular';
+import { FormGroup, AbstractControl, NgForm } from "@angular/forms";
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  ViewChild,
+} from "@angular/core";
+import { IHTMLFormControl } from "../../core/components/dynamic-inputs/core";
+import { createStateful } from "../../core/rxjs/helpers";
+import { DynamicControlParser } from "../../core/helpers/dynamic-control-parser";
+import { ComponentReactiveFormHelpers } from "../../core/components/dynamic-inputs/angular";
 
 @Component({
-  selector: 'app-login-view',
-  templateUrl: './login-view.component.html',
-  styleUrls: ['./login-view.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  selector: "app-login-view",
+  templateUrl: "./login-view.component.html",
+  styleUrls: ["./login-view.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginViewComponent {
-
   @Output() formSubmitted = new EventEmitter<object>();
   @Output() loadRegistrationViewEvent = new EventEmitter<boolean>();
 
@@ -40,15 +45,17 @@ export class LoginViewComponent {
   // tslint:disable-next-line: no-inferrable-types
   @Input() loggedIn: boolean = false;
 
-  @ViewChild('loginForm') loginForm: NgForm;
+  @ViewChild("loginForm") loginForm: NgForm;
 
-  @Input() public moduleName = 'Controle de Vie CNSS';
-  public cnssLogo = '/assets/images/app-logo.png';
+  @Input() public moduleName = "Controle de Vie CNSS";
+  public cnssLogo = "/assets/images/app-logo.png";
   /**
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
    */
-  constructor(private controlsParser: DynamicControlParser, public viewRouter: ComponentsRouterService ) {}
+  constructor(
+    private controlsParser: DynamicControlParser
+  ) {}
 
   buildForm(): AbstractControl {
     return this.controlsParser.buildFormGroupFromInputConfig(
@@ -56,19 +63,17 @@ export class LoginViewComponent {
     );
   }
 
-  onFormSubmit = (formGroup: FormGroup) =>  {
+  onFormSubmit = (formGroup: FormGroup) => {
     // Mark componentFormGroup controls as touched
-    ComponentReactiveFormHelpers.validateFormGroupFields(
-      formGroup
-    );
+    ComponentReactiveFormHelpers.validateFormGroupFields(formGroup);
     // Check if the formGroup is valid
     if (formGroup.valid) {
       // Fire formSubmitted event with the formGroup value
       this.formSubmitted.emit(formGroup.getRawValue());
     }
-  }
+  };
 
   onNavigateToRegistrationView = () => {
     this.loadRegistrationViewEvent.emit(true);
-  }
+  };
 }

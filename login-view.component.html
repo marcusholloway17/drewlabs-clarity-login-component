@@ -21,28 +21,5 @@
         <button type="submit" [disabled]="performingAction" class="btn btn-primary special btn-block"><clr-icon shape="login"></clr-icon>{{ "login.loginBtnText" | translate }}</button>
       </div>
     </form>
-    <div class="login-sub-section">
-      <div class="password-forget">
-        <span>{{ "login.passwordForgetText" | translate }}</span>
-        <button (click)="viewRouter.navigateByUrl('password-forget')" class="btn-link btn btn-sm">Cliquez-ici</button>
-      </div>
-      <div class="registration-area">
-        <h5 class="registration-header">{{ "login.registerHintText" | translate }}</h5>
-        <div class="registration-btn-container">
-          <button class="btn btn-outline-app" (click)="viewRouter.navigateByUrl('register')">
-            <clr-icon shape="plus"></clr-icon>{{ "login.registerBtnText" | translate }}
-          </button>
-        </div>
-      </div>
-      <div class="app-login-footer">
-        <div class="company-infos">
-          <div class="company-motto">{{ "login.companyMottoText" | translate }}</div>
-          <div class="company-website">www.cnss.tg</div>
-        </div>
-        <div class="app-login-logo-description">
-          {{ "login.poweredByText" | translate }}
-        </div>
-      </div>
-    </div>
   </div>
 </div>
