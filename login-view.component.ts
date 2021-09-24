@@ -18,14 +18,14 @@ export class LoginViewComponent {
   @Output() loadRegistrationViewEvent = new EventEmitter<boolean>();
 
   // tslint:disable-next-line: variable-name
-  private _componentFormGroup$ = createStateful<FormGroup>(null);
+  private _componentFormGroup$ = createStateful<FormGroup|undefined>(undefined);
   // tslint:disable-next-line: typedef
   get componentFormGroup$() {
     return this._componentFormGroup$.asObservable();
   }
 
   // tslint:disable-next-line: variable-name
-  private _controlConfigs: IHTMLFormControl[];
+  private _controlConfigs!: IHTMLFormControl[];
   @Input() set controlConfigs(value: IHTMLFormControl[]) {
     this._controlConfigs = value;
     this._componentFormGroup$.next(this.buildForm() as FormGroup);
@@ -40,10 +40,11 @@ export class LoginViewComponent {
   // tslint:disable-next-line: no-inferrable-types
   @Input() loggedIn: boolean = false;
 
-  @ViewChild('loginForm') loginForm: NgForm;
+  @ViewChild('loginForm') loginForm!: NgForm;
 
   @Input() public moduleName = 'Controle de Vie CNSS';
   public cnssLogo = '/assets/images/app-logo.png';
+
   /**
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
