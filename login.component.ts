@@ -7,7 +7,6 @@ import { TranslationService } from '../../core/translator';
 import { AuthService } from '../../core/auth/core';
 import { SessionStorage } from '../../core/storage/core';
 import { observableOf } from '../../core/rxjs/helpers';
-import { HttpRequestConfigs } from 'src/app/lib/core/http/core';
 import { isDefined } from 'src/app/lib/core/utils';
 import { doLog } from '../../core/rxjs/operators';
 import { User, userCanAny } from '../../core/auth/contracts/v2';
@@ -74,14 +73,14 @@ export class LoginComponent implements OnDestroy {
   ) {
     // Component state observale
     // Checks for session expiration
-    if (isDefined(cache.get(HttpRequestConfigs.sessionExpiredStorageKey))) {
+    if (isDefined(cache.get('X_SESSION_EXPIRED'))) {
       this.translations$.pipe(
         takeUntil(this.destroy$)
       ).subscribe(translations => {
         this.uiState.endAction(translations.sessionExpired, UIStateStatusCode.UNAUTHORIZED);
         setTimeout(() => {
           this.uiState.endAction();
-          cache.delete(HttpRequestConfigs.sessionExpiredStorageKey);
+          cache.delete('X_SESSION_EXPIRED');
         }, 3000);
       });
     } else {

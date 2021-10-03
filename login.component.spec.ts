@@ -12,7 +12,6 @@
 // import { HttpClient } from '@angular/common/http';
 // import { LoginComponent } from './login.component';
 // import { observaleOf } from '../../lib/rxjs/helpers/index';
-// import { HttpRequestService } from 'src/app/lib/http/core';
 // import { AppUser } from 'src/app/lib/auth/contracts/v2';
 // import { AuthRememberTokenService } from 'src/app/lib/auth-token/core';
 // import { AuthService } from 'src/app/lib/auth/core';
@@ -96,7 +95,7 @@
 //       { provide: DynamicControlParser, useClass: DynamicControlParserMock },
 //       { provide: Router, useValue: routerSpy },
 //       { provide: TranslateService, useClass: TranslateServiceStub },
-//       { provide: HttpRequestService, useValue: httpClientServiceSpy },
+//       { provide: HTTP_CLIENT, useValue: httpClientServiceSpy },
 //       { provide: AuthRememberTokenService, useValue: rememberTokenProviderSpy },
 //       { provide: ActivatedRoute, useValue: new ActivatedRouteStub(null, routeData) },
 //       AuthService,
