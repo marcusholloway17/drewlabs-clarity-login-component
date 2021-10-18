@@ -1,41 +1,24 @@
-<div
-  class="login-wrapper light-mode"
-  *ngIf="componentFormGroup$ | async as componentFormGroup"
->
+<div class="login-wrapper" *ngIf="componentFormGroup$ | async as componentFormGroup">
   <div class="login-overlay">
-    <form
-      class="login clr-form"
-      #loginForm="ngForm"
-      [formGroup]="componentFormGroup"
-      (ngSubmit)="onFormSubmit(componentFormGroup)"
-    >
+    <form class="login clr-form" #loginForm="ngForm" [formGroup]="componentFormGroup" (ngSubmit)="onFormSubmit(componentFormGroup)">
       <div class="login-group">
         <div class="title">
           <div class="login-logo">
-            <img [src]="cnssLogo" alt="CNSS" />
+            <img [src]="elewouLogo" alt="ELEWOU" />
           </div>
-          <!-- <span class="module-name"> {{ moduleName }} </span> -->
-          <span class="module-name">{{ 'login.loginText' | translate }}</span>
-          <!-- <h5 class="hint" [translate]="'login.loginSubText'"></h5> -->
+          <span class="module-name"> {{ moduleName }} </span>
+          <h5 class="hint" [translate]="'login.loginSubText'"></h5>
         </div>
         <div class="form form-container" *ngIf="componentFormGroup">
           <ng-container *ngFor="let value of controlConfigs">
-            <app-dynamic-inputs
-              [control]="componentFormGroup.controls[value.formControlName]"
-              [inputConfig]="value"
-            ></app-dynamic-inputs>
+            <app-dynamic-inputs [control]="componentFormGroup.controls[value.formControlName]" [inputConfig]="value">
+            </app-dynamic-inputs>
           </ng-container>
+          <button type="submit" [disabled]="performingAction" class="btn btn-primary btn-block"><clr-icon shape="login"></clr-icon>{{ "login.loginBtnText" | translate }}</button>
         </div>
-      </div>
-      <div class="login-btn-container">
-        <button
-          type="submit"
-          [disabled]="performingAction"
-          class="btn btn-primary special btn-block"
-        >
-          <clr-icon shape="login"></clr-icon>
-          {{ 'login.loginBtnText' | translate }}
-        </button>
+        <div class="app-login-footer">
+          <div class="app-login-logo-description">Powered by LIKSOFT</div>
+        </div>
       </div>
     </form>
   </div>
