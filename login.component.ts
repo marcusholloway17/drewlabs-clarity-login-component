@@ -95,11 +95,11 @@ export class LoginComponent implements OnDestroy {
       tap(state => {
         if (state.isLoggedIn) {
           // Checks if user has permission provided to the login component
-          if (!(state.user && (state.user instanceof User) && isDefined(this.route.snapshot.data.modulePermissions)
-            && !(userCanAny(state.user, this.route.snapshot.data.modulePermissions)))) {
+          if (!(state.user && (state.user instanceof User) && isDefined(this.route.snapshot.data.authorizations)
+            && !(userCanAny(state.user, this.route.snapshot.data.authorizations)))) {
             // Navigate to dashboard
             setTimeout(() => {
-              this.router.navigateByUrl(`/${this.route.snapshot.data.dashboardPath}`);
+              this.router.navigateByUrl(`/${this.route.snapshot.data.path}`);
             }, 1000);
           }
         }
