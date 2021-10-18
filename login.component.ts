@@ -14,6 +14,7 @@ import { User, userCanAny } from '../../core/auth/contracts/v2';
 import { IHTMLFormControl } from 'src/app/lib/core/components/dynamic-inputs/core';
 import { AppUIStateProvider } from '../../core/ui-state';
 import { UIStateStatusCode } from '../../core/contracts/ui-state';
+import { Log } from '../../core/utils/logger';
 export interface ComponentState {
   translations: { [index: string]: any };
   controlConfigs: IHTMLFormControl[];
@@ -95,11 +96,11 @@ export class LoginComponent implements OnDestroy {
       tap(state => {
         if (state.isLoggedIn) {
           // Checks if user has permission provided to the login component
-          if (!(state.user && (state.user instanceof User) && isDefined(this.route.snapshot.data.modulePermissions)
-            && !(userCanAny(state.user, this.route.snapshot.data.modulePermissions)))) {
+          if (!(state.user && (state.user instanceof User) && isDefined(this.route.snapshot.data.authorizations)
+            && !(userCanAny(state.user, this.route.snapshot.data.authorizations)))) {
             // Navigate to dashboard
             setTimeout(() => {
-              this.router.navigateByUrl(`/${this.route.snapshot.data.dashboardPath}`);
+              this.router.navigateByUrl(`/${this.route.snapshot.data.path}`);
             }, 1000);
           }
         }
