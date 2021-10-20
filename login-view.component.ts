@@ -12,6 +12,12 @@ import { createStateful } from "../../core/rxjs/helpers";
 import { DynamicControlParser } from "../../core/helpers/dynamic-control-parser";
 import { ComponentReactiveFormHelpers } from "../../core/components/dynamic-inputs/angular";
 
+interface LoginViewState {
+  controlConfigs: IHTMLFormControl[];
+  username: string | undefined;
+  password: string | undefined;
+}
+
 @Component({
   selector: "app-login-view",
   templateUrl: "./login-view.component.html",
@@ -33,13 +39,20 @@ export class LoginViewComponent {
 
   // tslint:disable-next-line: variable-name
   private _controlConfigs!: IHTMLFormControl[];
-  @Input() set controlConfigs(value: IHTMLFormControl[]) {
-    this._controlConfigs = value;
-    this._componentFormGroup$.next(this.buildForm() as FormGroup);
-  }
-  // tslint:disable-next-line: typedef
   get controlConfigs() {
     return this._controlConfigs;
+  }
+
+  @Input() set state(value: LoginViewState) {
+    this._controlConfigs = value.controlConfigs;
+    const formgroup = this.buildForm() as FormGroup;
+    // #region Set Default username an password before returning the formgroup
+    if (value?.username && value?.password) {
+      formgroup.get("username")?.setValue(value?.username);
+      formgroup.get("password")?.setValue(value?.password);
+    }
+    // #endregion
+    this._componentFormGroup$.next(formgroup);
   }
   // tslint:disable-next-line: no-inferrable-types
   @Input() performingAction: boolean = false;
