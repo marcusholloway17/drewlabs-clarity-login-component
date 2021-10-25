@@ -4,15 +4,19 @@ import {
   OnDestroy,
   Inject,
   Optional,
+  OnInit,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { mergeMap, takeUntil, tap, filter, map } from "rxjs/operators";
-import { Subject } from "rxjs";
 import { TRANSLATIONS, buildLoginFormControlObj } from "./constants";
 import { TranslationService } from "src/app/lib/core/translator";
 import { AuthService } from "src/app/lib/core/auth/core";
 import { SessionStorage } from "src/app/lib/core/storage/core";
-import { observableOf } from "src/app/lib/core/rxjs/helpers";
+import {
+  createSubject,
+  observableOf,
+  timeout,
+} from "src/app/lib/core/rxjs/helpers";
 import { isDefined } from "src/app/lib/core/utils";
 import { doLog } from "src/app/lib/core/rxjs/operators";
 import { User, userCanAny } from "src/app/lib/core/auth/contracts/v2";
@@ -48,8 +52,12 @@ export interface ComponentState {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent implements OnDestroy {
-  private destroy$ = new Subject<{}>();
+export class LoginComponent implements OnDestroy, OnInit {
+  // Properties definitions
+  private destroy$ = createSubject();
+  uiState$ = this.uiState.uiState;
+
+  // View text declarations
   moduleName = this.route.snapshot.data.moduleName;
   loginHeadingText = this.route.snapshot.data.loginHeadingText;
   // Load translations
@@ -64,7 +72,6 @@ export class LoginComponent implements OnDestroy {
       })
     )
   );
-  uiState$ = this.uiState.uiState;
 
   loginState$ = this.auth.state$.pipe(
     map((state) => {
@@ -79,6 +86,25 @@ export class LoginComponent implements OnDestroy {
         );
       }
       return state;
+    }),
+    tap((state) => {
+      // Checks if user has permission provided to the login component
+      if (
+        !state?.signingOut &&
+        !state?.authenticating &&
+        typeof state?.isInitialState !== "undefined" &&
+        state?.isInitialState !== null &&
+        state?.isInitialState !== true &&
+        state.isLoggedIn &&
+        state.user &&
+        state.user instanceof User &&
+        userCanAny(state.user, this.route.snapshot.data.authorizations ?? [])
+      ) {
+        // Navigate to dashboard
+        setTimeout(() => {
+          this.router.navigateByUrl(`/${this.route.snapshot.data.path}`);
+        }, 300);
+      }
     })
   );
 
@@ -96,12 +122,14 @@ export class LoginComponent implements OnDestroy {
     public route: ActivatedRoute,
     private auth: AuthService,
     public readonly router: Router,
-    cache: SessionStorage,
+    private cache: SessionStorage,
     @Optional() @Inject(CONFIG_MANAGER) public config?: ConfigurationManager
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     // Component state observale
     // Checks for session expiration
-    if (isDefined(cache.get("X_SESSION_EXPIRED"))) {
+    if (this.cache.get("X_SESSION_EXPIRED")) {
       this.translations$
         .pipe(takeUntil(this.destroy$))
         .subscribe((translations) => {
@@ -109,9 +137,9 @@ export class LoginComponent implements OnDestroy {
             translations.sessionExpired,
             UIStateStatusCode.UNAUTHORIZED
           );
-          setTimeout(() => {
+          timeout(() => {
             this.uiState.endAction();
-            cache.delete("X_SESSION_EXPIRED");
+            this.cache.delete("X_SESSION_EXPIRED");
           }, 3000);
         });
     } else {
@@ -119,37 +147,7 @@ export class LoginComponent implements OnDestroy {
     }
 
     // Set login state
-    this.loginState$
-      .pipe(
-        takeUntil(this.destroy$),
-        filter(
-          (state) => !state.authenticating && isDefined(state.isInitialState)
-        ),
-        doLog("Logging state in loggin component: "),
-        tap((state) => {
-          if (state.isLoggedIn) {
-            // Checks if user has permission provided to the login component
-            if (
-              !(
-                state.user &&
-                state.user instanceof User &&
-                isDefined(this.route.snapshot.data.authorizations) &&
-                !userCanAny(
-                  state.user,
-                  this.route.snapshot.data.authorizations ?? []
-                )
-              )
-            ) {
-              // Navigate to dashboard
-              setTimeout(() => {
-                console.log(`Navigating to: /${this.route.snapshot.data.path}`);
-                this.router.navigateByUrl(`/${this.route.snapshot.data.path}`);
-              }, 1000);
-            }
-          }
-        })
-      )
-      .subscribe();
+    this.loginState$.pipe(takeUntil(this.destroy$)).subscribe();
     // End Checks for auth expiration
   }
 
@@ -157,7 +155,7 @@ export class LoginComponent implements OnDestroy {
   async onChildComponentFormSubmitted(event: any) {
     // Start the UiState action
     this.uiState.startAction();
-    await this.auth.authenticate(Object.assign({}, event)).toPromise();
+    await this.auth.authenticate({ ...event }).toPromise();
   }
 
   runningInProdution() {
