@@ -47,8 +47,8 @@ export class LoginViewComponent {
 
   @ViewChild("loginForm") loginForm: NgForm;
 
-  @Input() public moduleName = "Controle de Vie CNSS";
-  public cnssLogo = "/assets/images/app-logo.png";
+  @Input() public moduleName = "Ressources humaines CNSS";
+  public elewouLogo = "/assets/images/logo-elewou-main.png";
   /**
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
@@ -68,6 +68,7 @@ export class LoginViewComponent {
     ComponentReactiveFormHelpers.validateFormGroupFields(formGroup);
     // Check if the formGroup is valid
     if (formGroup.valid) {
+      console.log("harry");
       // Fire formSubmitted event with the formGroup value
       this.formSubmitted.emit(formGroup.getRawValue());
     }

@@ -28,12 +28,12 @@ export const buildLoginFormControlObj: ConfigsBuilderFn =
       placeholder: translations['login.password'] ? translations['login.password'] : 'Mot de passe',
       formControlName: 'password',
       classes: 'clr-input',
-      pattern: '((?=[a-zA-Z]*)(?=d*)(?=[~!@#$%^&*()/-_]*).{6,})',
+      pattern: '((?=[a-zA-Z]*)(?=d*)(?=[~!@#$%^&*()/-_]*).{4,})',
       rules: {
         isRequired: true,
         pattern: true
       },
-      minLength: 6,
+      minLength: 4,
       value: defaults.password || null
     } as PasswordInput,
     // Add Remember control if required
