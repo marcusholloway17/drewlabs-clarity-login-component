@@ -1,12 +1,12 @@
-<div class="login-wrapper" *ngIf="componentFormGroup$ | async as componentFormGroup">
+<div class="mylogin-wrapper" *ngIf="componentFormGroup$ | async as componentFormGroup">
   <div class="login-overlay">
     <form class="login clr-form" #loginForm="ngForm" [formGroup]="componentFormGroup" (ngSubmit)="onFormSubmit(componentFormGroup)">
       <div class="login-group">
         <div class="title">
           <div class="login-logo">
-            <img [src]="elewouLogo" alt="ELEWOU" />
+            <img [src]="workspaceLogo" alt="EPAY WORKSPACE" />
           </div>
-          <span class="module-name"> {{ moduleName }} </span>
+          <span class="module-name"> Connexion </span>
           <h5 class="hint" [translate]="'login.loginSubText'"></h5>
         </div>
         <div class="form form-container" *ngIf="componentFormGroup">
