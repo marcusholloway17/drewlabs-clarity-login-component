@@ -6,11 +6,14 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
   ViewChild,
+  Inject,
 } from "@angular/core";
 import { IHTMLFormControl } from "../../core/components/dynamic-inputs/core";
-import { createStateful } from "../../core/rxjs/helpers";
-import { DynamicControlParser } from "../../core/helpers/dynamic-control-parser";
-import { ComponentReactiveFormHelpers } from "../../core/components/dynamic-inputs/angular";
+import {
+  AngularReactiveFormBuilderBridge,
+  ANGULAR_REACTIVE_FORM_BRIDGE,
+  ComponentReactiveFormHelpers,
+} from "../../core/components/dynamic-inputs/angular";
 
 @Component({
   selector: "app-login-view",
@@ -22,20 +25,13 @@ export class LoginViewComponent {
   @Output() formSubmitted = new EventEmitter<object>();
   @Output() loadRegistrationViewEvent = new EventEmitter<boolean>();
 
-  // tslint:disable-next-line: variable-name
-  private _componentFormGroup$ = createStateful<FormGroup | undefined>(
-    undefined
-  );
-  // tslint:disable-next-line: typedef
-  get componentFormGroup$() {
-    return this._componentFormGroup$.asObservable();
-  }
+  public formGroup: FormGroup;
 
   // tslint:disable-next-line: variable-name
   private _controlConfigs!: IHTMLFormControl[];
   @Input() set controlConfigs(value: IHTMLFormControl[]) {
     this._controlConfigs = value;
-    this._componentFormGroup$.next(this.buildForm() as FormGroup);
+    this.formGroup = this.builder.group(value) as FormGroup;
   }
   // tslint:disable-next-line: typedef
   get controlConfigs() {
@@ -56,13 +52,10 @@ export class LoginViewComponent {
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
    */
-  constructor(private controlsParser: DynamicControlParser) {}
-
-  buildForm(): AbstractControl {
-    return this.controlsParser.buildFormGroupFromInputConfig(
-      this.controlConfigs
-    );
-  }
+  constructor(
+    @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
+    private builder: AngularReactiveFormBuilderBridge
+  ) {}
 
   onFormSubmit = (formGroup: FormGroup) => {
     // Mark componentFormGroup controls as touched
