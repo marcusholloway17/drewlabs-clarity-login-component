@@ -18,11 +18,11 @@
   max-width: none;
 }
 
-.login-overlay {
+/* .login-overlay {
   position: relative;
   background: rgba(12, 56, 80, 0.88);
   width: 100%;
-}
+} */
 
 form.login.clr-form {
   margin: 0 auto;
