@@ -7,3 +7,7 @@ export {
   DoubleAuthSignInResultInterface,
   UnAuthenticatedResultInterface,
 } from "./signin";
+
+export { AuthServiceConfig } from "./auth";
+
+export { RequestClient } from "./request";

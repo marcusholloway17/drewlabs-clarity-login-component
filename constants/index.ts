@@ -1,16 +1,14 @@
-export { buildLoginFormControlObj } from './login-form';
+export { buildLoginFormControlObj } from "./login-form";
 
-/**
- * @description Login form translation keys
- */
-export const TRANSLATIONS = [
-  'login.username',
-  'login.password',
-  'login.rememberMe',
-  'login.authenticationFailed',
-  'login.authenticating',
-  'invalidRequestParams',
-  'serverRequestFailed',
-  'unauthorizedAccess',
-  'sessionExpired'
-];
+export { TRANSLATIONS } from "./translations";
+
+export {
+  ERR_LOGIN_STRATEGY_NOT_FOUND,
+  ERR_NOT_INITIALIZED,
+  ERR_NOT_LOGGED_IN,
+  ERR_NOT_SUPPORTED_FOR_REFRESH_TOKEN,
+  AUTH_SERVICE_CONFIG,
+  AuthActions,
+} from "./auth";
+
+export { AuthStrategies } from "./strategies";
