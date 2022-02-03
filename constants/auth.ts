@@ -1,5 +1,5 @@
 import { InjectionToken } from "@angular/core";
-import { AuthServiceConfig } from "../contracts";
+import { AuthServiceConfig, AuthServiceInterface } from "../contracts";
 
 export const ERR_LOGIN_STRATEGY_NOT_FOUND = "AUTH STRATEGY NOT FOUND";
 export const ERR_NOT_LOGGED_IN = "NOT LOGGED IN";
@@ -12,8 +12,12 @@ export const AUTH_SERVICE_CONFIG = new InjectionToken<AuthServiceConfig>(
   "AuthServiceConfig instance injection token"
 );
 
+export const AUTH_SERVICE = new InjectionToken<AuthServiceInterface>(
+  "AuthServiceInterface instance injection token"
+);
+
 export enum AuthActions {
-    ONGOING = 0,
-    COMPLETE = 1,
-    FAILED = 2
+  ONGOING = 0,
+  COMPLETE = 1,
+  FAILED = 2,
 }

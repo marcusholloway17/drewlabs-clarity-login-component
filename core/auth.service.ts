@@ -25,6 +25,7 @@ import {
   SignInResultInterface,
   StrategyInterface,
 } from "../contracts";
+import { AuthServiceInterface } from "../contracts/auth";
 
 const isPromise = (p: any) => {
   return typeof p === "object" && typeof p.then === "function" ? true : false;
@@ -33,15 +34,8 @@ const isPromise = (p: any) => {
 const asObservable = (state: any) =>
   isObservable(state) ? state : isPromise(state) ? from(state) : of(state);
 
-/**
- * The service encapsulating authentication functionality. Exposes methods like
- * `signIn`, `signOut`. Also, exposes an `signInState` `Observable` that one can
- * subscribe to get the current logged in user information.
- *
- * @dynamic
- */
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthServiceInterface {
   // Properties definitions
   private strategies = new Map<string, StrategyInterface>();
   private autoLogin = false;

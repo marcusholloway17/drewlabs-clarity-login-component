@@ -8,6 +8,7 @@ export {
   ERR_NOT_LOGGED_IN,
   ERR_NOT_SUPPORTED_FOR_REFRESH_TOKEN,
   AUTH_SERVICE_CONFIG,
+  AUTH_SERVICE,
   AuthActions,
 } from "./auth";
 

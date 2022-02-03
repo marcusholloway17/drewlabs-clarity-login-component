@@ -8,6 +8,6 @@ export {
   UnAuthenticatedResultInterface,
 } from "./signin";
 
-export { AuthServiceConfig } from "./auth";
+export { AuthServiceConfig, AuthServiceInterface } from "./auth";
 
 export { RequestClient } from "./request";
