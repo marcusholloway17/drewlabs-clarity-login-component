@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, of, Subject } from "rxjs";
-import { map, mergeMap } from "rxjs/operators";
+import { map, mergeMap, tap } from "rxjs/operators";
 import {
   SignInOptionsType,
   SignInResultInterface,
@@ -35,8 +35,8 @@ const LOCAL_API_LOGOUT = "auth/v2/logout";
 
 export class LocalStrategy implements StrategyInterface {
   // Properties definition
-  _loginState$ = new BehaviorSubject<SignInResultInterface>(undefined);
-  loginState$ = this._loginState$.asObservable();
+  _signInState$ = new BehaviorSubject<SignInResultInterface>(undefined);
+  signInState$ = this._signInState$.asObservable();
 
   private _request2FaConsent$ = new Subject<string>();
   request2FaConsent$ = this._request2FaConsent$.asObservable();
@@ -44,8 +44,10 @@ export class LocalStrategy implements StrategyInterface {
   // Instance initializer
   constructor(private http: RequestClient, private host: string) {}
 
-  initialize(): Observable<void> {
-    throw new Error("Method not implemented.");
+  initialize(autologin?: boolean): Observable<void> {
+    // TODO : If Auto-login is true, load the signIn result from the cache storage
+    // And publish a signInResult event
+    return of();
   }
 
   signIn(options?: SignInOptionsType) {
@@ -74,7 +76,7 @@ export class LocalStrategy implements StrategyInterface {
           return this.http.get(`${host(this.host)}/${LOCAL_API_GET_USER}`).pipe(
             map((user: GetUserDetailsResult) => {
               if (state) {
-                this._loginState$.next({
+                this._signInState$.next({
                   ...(state as SignInResultInterface),
                   id: user.id,
                   emails: user?.user_details?.emails,

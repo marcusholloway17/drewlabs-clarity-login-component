@@ -1,16 +1,17 @@
-import { Inject, Injectable } from "@angular/core";
+import { Inject, Injectable, OnDestroy } from "@angular/core";
 import {
   catchError,
   forkJoin,
   from,
   isObservable,
   lastValueFrom,
-  mergeMap,
   of,
   ReplaySubject,
   startWith,
+  Subject,
   tap,
   throwError,
+  takeUntil,
 } from "rxjs";
 import {
   AuthActions,
@@ -24,8 +25,9 @@ import {
   AuthServiceConfig,
   SignInResultInterface,
   StrategyInterface,
+  AuthStrategiesContainer,
+  AuthServiceInterface,
 } from "../contracts";
-import { AuthServiceInterface } from "../contracts/auth";
 
 const isPromise = (p: any) => {
   return typeof p === "object" && typeof p.then === "function" ? true : false;
@@ -35,10 +37,12 @@ const asObservable = (state: any) =>
   isObservable(state) ? state : isPromise(state) ? from(state) : of(state);
 
 @Injectable()
-export class AuthService implements AuthServiceInterface {
+export class AuthService
+  implements AuthServiceInterface, AuthStrategiesContainer, OnDestroy
+{
   // Properties definitions
   private strategies = new Map<string, StrategyInterface>();
-  private autoLogin = false;
+  private autologin = false;
 
   private _signInResult: SignInResultInterface = undefined;
 
@@ -53,6 +57,8 @@ export class AuthService implements AuthServiceInterface {
   public actionsState$ = this._actionsState$.pipe(
     startWith(AuthActions.ONGOING)
   );
+
+  private _destroy$ = new Subject<void>();
 
   /**
    * @param config A `AuthServiceConfig` object or a `Promise` that resolves to a `AuthServiceConfig` object
@@ -71,30 +77,31 @@ export class AuthService implements AuthServiceInterface {
   private async initialize(config: AuthServiceConfig) {
     const onError = this.applyConfigs(config);
     this._actionsState$.next(AuthActions.ONGOING);
-    const initializers = forkJoin([
-      Array.from(this.strategies.values()).map((strategy) =>
-        asObservable(strategy.initialize())
-      ),
-    ]).pipe(
-      mergeMap(() => {
-        if (this.autoLogin) {
-          return forkJoin(
-            Array.from(this.strategies.entries()).map(([key, strategy]) => {
-              return strategy.loginState$.pipe(
-                tap((signInResult: SignInResultInterface) => {
-                  this._signInResult = { ...signInResult, provider: key };
-                  this._signInState$.next(this._signInResult);
-                })
-              );
-            })
-          );
-        }
-        return of([]);
+    // Subscribe to strategies signInState$ changes
+    // If a provider sign in state change, the authservice _signInState$ publish
+    // an authenticated event that the view can use to sign user in
+    forkJoin(
+      Array.from(this.strategies.entries()).map(([key, strategy]) => {
+        return strategy.signInState$.pipe(
+          tap((signInResult: SignInResultInterface) => {
+            if (signInResult) {
+              this._signInResult = { ...signInResult, provider: key };
+              this._signInState$.next(this._signInResult);
+            }
+          })
+        );
       })
-    );
-
+    )
+      .pipe(takeUntil(this._destroy$))
+      .subscribe();
     try {
-      await lastValueFrom(initializers);
+      await lastValueFrom(
+        forkJoin([
+          Array.from(this.strategies.values()).map((strategy) =>
+            asObservable(strategy.initialize(this.autologin))
+          ),
+        ])
+      );
     } catch (error) {
       this._actionsState$.next(AuthActions.FAILED);
       onError(error);
@@ -112,22 +119,6 @@ export class AuthService implements AuthServiceInterface {
         reject(ERR_NOT_SUPPORTED_FOR_REFRESH_TOKEN);
       } else {
         // TODO : CALL GET REFRESH TOKEN ON SUPPRTE STRATEGIES
-        // const providerObject = this.providers.get(providerId);
-        // if (providerObject) {
-        //   providerObject
-        //     .getLoginStatus({ refreshToken: true })
-        //     .then((user: SignInResultInterface) => {
-        //       user.provider = providerId;
-        //       this._user = user;
-        //       this._authState.next(user);
-        //       resolve();
-        //     })
-        //     .catch((err) => {
-        //       reject(err);
-        //     });
-        // } else {
-        //   reject(ERR_LOGIN_STRATEGY_NOT_FOUND);
-        // }
       }
     });
   }
@@ -184,11 +175,19 @@ export class AuthService implements AuthServiceInterface {
     );
   }
 
+  public getStrategy(id: AuthStrategies) {
+    return this.strategies.get(id);
+  }
+
   private applyConfigs(config: AuthServiceConfig) {
-    this.autoLogin = config.autoLogin ?? false;
+    this.autologin = config.autoLogin ?? false;
     config.strategies.forEach((item) => {
       this.strategies.set(item.id, item.strategy);
     });
     return config.onError ?? console.error;
+  }
+
+  public ngOnDestroy() {
+    this._destroy$.next();
   }
 }

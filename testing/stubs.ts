@@ -7,7 +7,7 @@ import {
 
 export const AUTHENTICATED_RESULT = {
   authToken: "<TOKEN>",
-  provider: "local",
+  provider: "LOCAL",
   id: 1,
   idToken: "<TOKEN_ID>",
   authorizationCode: undefined,
@@ -108,7 +108,13 @@ export class HttpClient implements RequestClient {
           locked: true,
         } as UnAuthenticatedResultInterface);
       case ResponseTypes.AUTHENTICATED:
-        return of(AUTHENTICATED_RESULT as Partial<SignInResultInterface>);
+        body = body ?? {};
+        if (body.username === "ADMIN" && body.password === "secret") {
+          return of(AUTHENTICATED_RESULT as Partial<SignInResultInterface>);
+        }
+        return of({
+          authenticated: false,
+        } as UnAuthenticatedResultInterface);
       default:
         break;
     }

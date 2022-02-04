@@ -33,9 +33,13 @@ describe("LocalStrategy", () => {
   it("#signIn should return an observable of true", async (done: DoneFn) => {
     client.setResponseType(ResponseTypes.AUTHENTICATED);
     let loginState = undefined;
-    service.loginState$.pipe(tap((state) => (loginState = state))).subscribe();
+    service.signInState$
+      .pipe(
+        tap((state) => (loginState = state)),
+        tap(console.log)
+      )
+      .subscribe();
     const result = await lastValueFrom(service.signIn());
-    expect(result).toBe(true);
     expect(loginState).toEqual({
       ...AUTHENTICATED_RESULT,
       id: 1,

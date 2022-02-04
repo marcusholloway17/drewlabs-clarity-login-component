@@ -50,7 +50,7 @@ export interface ComponentState {
 })
 export class LoginComponent implements OnDestroy, OnInit {
   // Properties definitions
-  private destroy$ = createSubject();
+  private destroy$ = createSubject<void>();
   uiState$ = this.uiState.uiState;
 
   // View text declarations

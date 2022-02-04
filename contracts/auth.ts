@@ -1,5 +1,15 @@
 import { Observable } from "rxjs";
+import { AuthStrategies } from "../constants/strategies";
+import { SignInResultInterface } from "./signin";
 import { StrategyInterface } from "./strategy";
+
+
+export interface AuthStrategiesContainer {
+  /**
+   * @description Returns the strategy matching the user provided id or undefined if not found
+   */
+  getStrategy(id: AuthStrategies): StrategyInterface;
+}
 
 /**
  * An interface to define the shape of the service configuration options.
@@ -17,6 +27,12 @@ export interface AuthServiceConfig {
  *
  */
 export interface AuthServiceInterface {
+
+  /**
+   * @description Signin operation result state
+   */
+  signInState$: Observable<SignInResultInterface>;
+
   /**
    * A method used to sign in a user with a specific `Strategy`.
    *
@@ -24,7 +40,7 @@ export interface AuthServiceInterface {
    * @param options Optional {@code Strategy} specific arguments
    * @returns A `Promise` that resolves to the authenticated user information
    */
-  signIn(id: string, options?: any): Observable<boolean> | Observable<any>;
+  signIn(id: AuthStrategies, options?: any): Observable<boolean> | Observable<any>;
 
   /**
    * A method used to sign out the currently loggen in user.
