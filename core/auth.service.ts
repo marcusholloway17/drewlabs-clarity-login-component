@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnDestroy } from "@angular/core";
+import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import {
   catchError,
   forkJoin,
@@ -20,6 +20,7 @@ import {
   ERR_LOGIN_STRATEGY_NOT_FOUND,
   ERR_NOT_INITIALIZED,
   ERR_NOT_SUPPORTED_FOR_REFRESH_TOKEN,
+  AUTH_ACTION_HANDLERS,
 } from "../constants";
 import {
   AuthServiceConfig,
@@ -27,6 +28,7 @@ import {
   StrategyInterface,
   AuthStrategiesContainer,
   AuthServiceInterface,
+  AuthActionHandlers,
 } from "../contracts";
 
 const isPromise = (p: any) => {
@@ -36,7 +38,9 @@ const isPromise = (p: any) => {
 const asObservable = (state: any) =>
   isObservable(state) ? state : isPromise(state) ? from(state) : of(state);
 
-@Injectable()
+@Injectable({
+  providedIn: "root",
+})
 export class AuthService
   implements AuthServiceInterface, AuthStrategiesContainer, OnDestroy
 {
@@ -65,7 +69,10 @@ export class AuthService
    */
   constructor(
     @Inject(AUTH_SERVICE_CONFIG)
-    config: AuthServiceConfig | Promise<AuthServiceConfig>
+    config: AuthServiceConfig | Promise<AuthServiceConfig>,
+    @Optional()
+    @Inject(AUTH_ACTION_HANDLERS)
+    private handlers: AuthActionHandlers
   ) {
     config instanceof Promise
       ? config.then((config) => {
@@ -139,10 +146,17 @@ export class AuthService
       throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
     this._actionsState$.next(AuthActions.ONGOING);
+    this.handlers?.onPerformingAction();
     return strategy.signIn(options).pipe(
-      tap(() => this._actionsState$.next(AuthActions.COMPLETE)),
+      tap((state) => {
+        state
+          ? this.handlers?.onAuthenticaltionSuccessful()
+          : this.handlers?.onAuthenticationFailure();
+        this._actionsState$.next(AuthActions.COMPLETE);
+      }),
       catchError((err) => {
         this._actionsState$.next(AuthActions.FAILED);
+        this.handlers?.onError();
         return throwError(() => err);
       })
     );
@@ -170,6 +184,7 @@ export class AuthService
       tap(() => this._actionsState$.next(AuthActions.COMPLETE)),
       catchError((err) => {
         this._actionsState$.next(AuthActions.FAILED);
+        this.handlers?.onError();
         return throwError(() => err);
       })
     );

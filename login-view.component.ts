@@ -1,4 +1,11 @@
-import { FormGroup, AbstractControl, NgForm } from "@angular/forms";
+import {
+  FormGroup,
+  AbstractControl,
+  NgForm,
+  FormBuilder,
+  FormArray,
+  Validators,
+} from "@angular/forms";
 import {
   Component,
   Input,
@@ -6,14 +13,7 @@ import {
   EventEmitter,
   ChangeDetectionStrategy,
   ViewChild,
-  Inject,
 } from "@angular/core";
-import { IHTMLFormControl } from "../../core/components/dynamic-inputs/core";
-import {
-  AngularReactiveFormBuilderBridge,
-  ANGULAR_REACTIVE_FORM_BRIDGE,
-  ComponentReactiveFormHelpers,
-} from "../../core/components/dynamic-inputs/angular";
 
 @Component({
   selector: "app-login-view",
@@ -25,47 +25,65 @@ export class LoginViewComponent {
   @Output() formSubmitted = new EventEmitter<object>();
   @Output() loadRegistrationViewEvent = new EventEmitter<boolean>();
 
-  public formGroup: FormGroup;
+  public formGroup: FormGroup = this.builder.group({
+    username: this.builder.control(
+      undefined,
+      Validators.compose([Validators.maxLength(190), Validators.required])
+    ),
+    password: this.builder.control(
+      undefined,
+      Validators.compose([
+        Validators.required,
+        Validators.pattern(/((?=[a-zA-Z]*)(?=d*)(?=[~!@#$%^&*()/-_]*).{6,})/),
+      ])
+    ),
+  });
 
-  // tslint:disable-next-line: variable-name
-  private _controlConfigs!: IHTMLFormControl[];
-  @Input() set controlConfigs(value: IHTMLFormControl[]) {
-    this._controlConfigs = value;
-    this.formGroup = this.builder.group(value) as FormGroup;
-  }
-  // tslint:disable-next-line: typedef
-  get controlConfigs() {
-    return this._controlConfigs;
-  }
   // tslint:disable-next-line: no-inferrable-types
   @Input() performingAction: boolean = false;
-
   // tslint:disable-next-line: no-inferrable-types
   @Input() loggedIn: boolean = false;
-
   @ViewChild("loginForm") loginForm!: NgForm;
-
-  @Input() public moduleName = "EPay WorkSpace";
-  public workspaceLogo = "/assets/images/epaylogo.png";
+  @Input() public moduleName = "APPNAME";
+  @Input() logoAssetPath = "...";
+  @Input() hasRememberMe: boolean;
 
   /**
-   * @description Component object instance initializer
-   * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
+   * Component object instance initializer
+   * @param builder
    */
-  constructor(
-    @Inject(ANGULAR_REACTIVE_FORM_BRIDGE)
-    private builder: AngularReactiveFormBuilderBridge
-  ) {}
+  constructor(private builder: FormBuilder) {}
 
-  onFormSubmit = (formGroup: FormGroup) => {
+  onFormSubmit(formGroup: FormGroup) {
     // Mark componentFormGroup controls as touched
-    ComponentReactiveFormHelpers.validateFormGroupFields(formGroup);
+    this.validateFormGroupFields(formGroup);
     // Check if the formGroup is valid
     if (formGroup.valid) {
       // Fire formSubmitted event with the formGroup value
       this.formSubmitted.emit(formGroup.getRawValue());
     }
-  };
+  }
+
+  private validateFormGroupFields(control: FormGroup | FormArray): void {
+    Object.keys(control.controls).forEach((field: string) => {
+      if (control.get(field) instanceof FormGroup) {
+        this.validateFormGroupFields(control.get(field) as FormGroup);
+      } else {
+        this.markControlAsTouched(control.get(field) || undefined, field);
+      }
+    });
+  }
+
+  private markControlAsTouched(
+    control?: AbstractControl,
+    field?: string
+  ): void {
+    if (control) {
+      control?.markAsTouched({ onlySelf: true });
+      control?.markAsDirty({ onlySelf: true });
+      control?.markAsPristine({ onlySelf: true });
+    }
+  }
 
   onNavigateToRegistrationView = () => {
     this.loadRegistrationViewEvent.emit(true);

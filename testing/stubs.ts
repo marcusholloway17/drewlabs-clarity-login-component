@@ -90,7 +90,9 @@ export enum ResponseTypes {
 }
 
 export class HttpClient implements RequestClient {
-  constructor(private responseType: ResponseTypes = undefined) {}
+  constructor(
+    private responseType: ResponseTypes = ResponseTypes.AUTHENTICATED
+  ) {}
 
   public setResponseType(responseType: ResponseTypes) {
     this.responseType = responseType;

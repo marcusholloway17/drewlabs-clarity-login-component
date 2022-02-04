@@ -12,6 +12,7 @@ export {
   AuthServiceConfig,
   AuthServiceInterface,
   AuthStrategiesContainer,
+  AuthActionHandlers
 } from "./auth";
 
 export { RequestClient } from "./request";

@@ -20,6 +20,13 @@ export interface AuthServiceConfig {
   onError?: (error: any) => any;
 }
 
+export interface AuthActionHandlers {
+  onAuthenticaltionSuccessful: () => void,
+  onAuthenticationFailure: () => void,
+  onPerformingAction: () => void,
+  onError: () => void
+}
+
 /**
  * The service encapsulating authentication functionality. Exposes methods like
  * `signIn`, `signOut`. Also, exposes an `signInState` `Observable` that one can

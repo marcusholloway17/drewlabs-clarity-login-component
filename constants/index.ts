@@ -1,5 +1,3 @@
-export { buildLoginFormControlObj } from "./login-form";
-
 export { TRANSLATIONS } from "./translations";
 
 export {
@@ -10,6 +8,7 @@ export {
   AUTH_SERVICE_CONFIG,
   AUTH_SERVICE,
   AuthActions,
+  AUTH_ACTION_HANDLERS,
 } from "./auth";
 
 export { AuthStrategies } from "./strategies";

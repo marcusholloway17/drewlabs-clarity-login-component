@@ -1,15 +1,27 @@
-import { NgModule } from '@angular/core';
-import { LOGIN_NAVIGATION_COMPONENTS, LoginRoutingModule } from './login-routing.module';
-import { RouterModule } from '@angular/router';
-import { SharedModule } from '../shared.module';
+import { NgModule } from "@angular/core";
+import {
+  LOGIN_NAVIGATION_COMPONENTS,
+  LoginRoutingModule,
+} from "./login-routing.module";
+import { RouterModule } from "@angular/router";
+import { CommonModule } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { TranslateModule } from "@ngx-translate/core";
+import { ClarityModule } from "@clr/angular";
+import { StrategyBasedAuthModule } from "./core/auth.module";
 
 @NgModule({
   imports: [
-    SharedModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     RouterModule,
-    LoginRoutingModule
+    LoginRoutingModule,
+    TranslateModule,
+    ClarityModule,
+    StrategyBasedAuthModule,
   ],
   declarations: [...LOGIN_NAVIGATION_COMPONENTS],
-  providers: []
+  providers: [],
 })
-export class LoginModule { }
+export class LoginModule {}
