@@ -63,7 +63,7 @@ export class LoginViewComponent {
   @ViewChild("loginForm") loginForm!: NgForm;
 
   @Input() public moduleName = "Controle de Vie CNSS";
-  public cnssLogo = "/assets/images/app-logo.png";
+  public appLogo = "/assets/images/app-logo.png";
 
   /**
    * @description Component object instance initializer
