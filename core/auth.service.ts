@@ -109,6 +109,17 @@ export class AuthService
           ),
         ])
       );
+
+      if (this.autologin) {
+        await Promise.all(
+          Array.from(this.strategies.entries()).map(async ([key, provider]) => {
+            let signInResult = await provider.getLoginStatus();
+            if (signInResult) {
+              this._signInState$.next(signInResult);
+            }
+          })
+        );
+      }
     } catch (error) {
       this._actionsState$.next(AuthActions.FAILED);
       onError(error);

@@ -16,3 +16,5 @@ export {
 } from "./auth";
 
 export { RequestClient } from "./request";
+
+export { AuthClientConfig } from './clients';

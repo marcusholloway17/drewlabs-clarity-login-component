@@ -4,13 +4,12 @@ import {
   AuthStrategies,
   AUTH_SERVICE,
   AUTH_SERVICE_CONFIG,
-  AUTH_ACTION_HANDLERS,
 } from "../constants";
-import { AuthServiceConfig } from "../contracts";
 import {
   AuthGuardService,
   AuthInterceptorService,
   AuthorizationsGuard,
+  ClientAuthorizationInterceptor,
 } from "../guards";
 import { HttpClient } from "../testing/stubs";
 import { AuthService } from "./auth.service";
@@ -22,7 +21,7 @@ import { LocalStrategy } from "./strategies";
 export class StrategyBasedAuthModule {
   static forRoot(
     authResultHandlersProvider: Provider,
-    authConfig: AuthServiceConfig = undefined
+    authConfigProvider: Provider = undefined
   ): ModuleWithProviders<StrategyBasedAuthModule> {
     return {
       ngModule: StrategyBasedAuthModule,
@@ -36,11 +35,16 @@ export class StrategyBasedAuthModule {
           useClass: AuthInterceptorService,
           multi: true,
         },
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: ClientAuthorizationInterceptor,
+          multi: true
+        },
         AuthorizationsGuard,
         AuthGuardService,
-        {
+        authConfigProvider ?? {
           provide: AUTH_SERVICE_CONFIG,
-          useValue: authConfig ?? {
+          useValue: {
             strategies: [
               {
                 id: AuthStrategies.LOCAL,

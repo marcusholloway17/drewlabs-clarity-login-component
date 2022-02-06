@@ -6,6 +6,8 @@ export interface StrategyInterface {
 
   signInState$: Observable<SignInResultInterface>;
 
+  getLoginStatus(): Promise<SignInResultInterface>;
+
   signIn(options?: SignInOptionsType): Observable<boolean>;
 
   signOut(revoke?: boolean): Observable<boolean>;

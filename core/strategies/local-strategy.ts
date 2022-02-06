@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, of, Subject } from "rxjs";
-import { map, mergeMap, tap } from "rxjs/operators";
+import { map, mergeMap } from "rxjs/operators";
 import {
   SignInOptionsType,
   SignInResultInterface,
@@ -33,6 +33,8 @@ const LOCAL_API_LOGIN = "auth/v2/login";
 
 const LOCAL_API_LOGOUT = "auth/v2/logout";
 
+const LOCAL_SIGNIN_RESULT_CACHE = "LOCAL_STRATEGY_SIGNIN_RESULT_CACHE";
+
 export class LocalStrategy implements StrategyInterface {
   // Properties definition
   _signInState$ = new BehaviorSubject<SignInResultInterface>(undefined);
@@ -42,12 +44,32 @@ export class LocalStrategy implements StrategyInterface {
   request2FaConsent$ = this._request2FaConsent$.asObservable();
 
   // Instance initializer
-  constructor(private http: RequestClient, private host: string) {}
+  constructor(
+    private http: RequestClient,
+    private host: string,
+    private cache: Storage = undefined
+  ) {}
 
   initialize(autologin?: boolean): Observable<void> {
     // TODO : If Auto-login is true, load the signIn result from the cache storage
     // And publish a signInResult event
     return of();
+  }
+
+  getLoginStatus() {
+    return new Promise<SignInResultInterface>((resolve, reject) => {
+      if (this.cache) {
+        const value = this.cache.getItem(LOCAL_SIGNIN_RESULT_CACHE) as any;
+        if (typeof value === "undefined" || value === null) {
+          return resolve(undefined);
+        }
+        if (typeof value === "string") {
+          return resolve(JSON.parse(value) as SignInResultInterface);
+        }
+        return resolve(value);
+      }
+      return resolve(undefined);
+    });
   }
 
   signIn(options?: SignInOptionsType) {
@@ -73,24 +95,41 @@ export class LocalStrategy implements StrategyInterface {
           ) {
             return of(false);
           }
-          return this.http.get(`${host(this.host)}/${LOCAL_API_GET_USER}`).pipe(
-            map((user: GetUserDetailsResult) => {
-              if (state) {
-                this._signInState$.next({
-                  ...(state as SignInResultInterface),
-                  id: user.id,
-                  emails: user?.user_details?.emails,
-                  name: user?.username,
-                  photoUrl: user?.user_details?.profile_url,
-                  firstName: user?.user_details?.firstname,
-                  lastName: user?.user_details?.lastname,
-                  phoneNumber: user?.user_details?.phone_number,
-                  address: user?.user_details?.address,
-                });
-              }
-              return true;
+          return this.http
+            .get(`${host(this.host)}/${LOCAL_API_GET_USER}`, {
+              headers: {
+                Authorization: `Bearer ${
+                  (state as Partial<SignInResultInterface>).authToken
+                }`,
+              },
             })
-          );
+            .pipe(
+              map((user: GetUserDetailsResult) => {
+                if (state) {
+                  const result = {
+                    ...(state as SignInResultInterface),
+                    id: user.id,
+                    emails: user?.user_details?.emails,
+                    name: user?.username,
+                    photoUrl: user?.user_details?.profile_url,
+                    firstName: user?.user_details?.firstname,
+                    lastName: user?.user_details?.lastname,
+                    phoneNumber: user?.user_details?.phone_number,
+                    address: user?.user_details?.address,
+                  };
+                  this._signInState$.next(result);
+
+                  // TODO : Add result details to cache for autologin
+                  if (this.cache) {
+                    this.cache.setItem(
+                      LOCAL_SIGNIN_RESULT_CACHE,
+                      JSON.stringify(result)
+                    );
+                  }
+                }
+                return true;
+              })
+            );
         })
       );
   }

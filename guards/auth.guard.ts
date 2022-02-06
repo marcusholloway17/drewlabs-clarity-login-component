@@ -9,7 +9,7 @@ import {
   Route,
 } from "@angular/router";
 import { Observable, Subject } from "rxjs";
-import { filter, map, takeUntil, tap } from "rxjs";
+import { map } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
 import { AuthServiceInterface } from "../contracts";
 
@@ -17,7 +17,6 @@ import { AuthServiceInterface } from "../contracts";
 export class AuthGuardService
   implements CanActivate, CanActivateChild, CanLoad, OnDestroy
 {
-  private authState$ = this.auth.signInState$;
   // tslint:disable-next-line: variable-name
   private _destroy$ = new Subject<void>();
 
@@ -29,25 +28,27 @@ export class AuthGuardService
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean> | boolean | Promise<boolean> {
-    const url: string = state.url;
-    return this.checkLogin(url);
+  ): Observable<boolean> {
+    return this.checkAuthStatus(state.url);
   }
 
   canActivateChild(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean> | boolean | Promise<boolean> {
+  ): Observable<boolean> {
     return this.canActivate(route, state);
   }
 
-  canLoad(route: Route): Observable<boolean> | boolean | Promise<boolean> {
-    const url = `/${route.path}`;
-    return this.checkLogin(url);
+  canLoad(route: Route): Observable<boolean> {
+    return this.checkAuthStatus(`/${route.path}`);
   }
 
-  checkLogin(url: string): Observable<boolean> | boolean | Promise<boolean> {
-    return true;
+  checkAuthStatus(url: string): Observable<boolean> {
+    return this.auth.signInState$.pipe(
+      map((state) => {
+        return state && state.authToken ? true : false;
+      })
+    );
   }
 
   ngOnDestroy(): void {
