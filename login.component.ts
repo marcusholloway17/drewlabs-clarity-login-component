@@ -57,6 +57,7 @@ export class LoginComponent implements OnDestroy {
     this.auth.signInState$
       .pipe(
         tap((state) => {
+          console.log(state);
           // TODO : CHECK IF USER HAS ABILITIES
           if (state) {
             // TODO : NAVIGATE TO THE APPLICATION DASHBOARD

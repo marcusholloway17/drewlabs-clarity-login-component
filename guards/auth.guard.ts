@@ -8,7 +8,7 @@ import {
   CanLoad,
   Route,
 } from "@angular/router";
-import { Observable, Subject } from "rxjs";
+import { Observable, Subject, tap } from "rxjs";
 import { map } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
 import { AuthServiceInterface } from "../contracts";
@@ -47,6 +47,12 @@ export class AuthGuardService
     return this.auth.signInState$.pipe(
       map((state) => {
         return state && state.authToken ? true : false;
+      }),
+      tap((state) => {
+        if (state) {
+          return;
+        }
+        this.router.navigateByUrl("/login");
       })
     );
   }
