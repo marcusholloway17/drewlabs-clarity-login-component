@@ -45,7 +45,7 @@ export class LoginViewComponent {
 
   @ViewChild("loginForm") loginForm!: NgForm;
 
-  @Input() public moduleName = "FinApp Clients";
+  @Input() public moduleName;
   public workspaceLogo = "app/lib/views/global-styles/assets/images/app-logo.png";
 
   /**
