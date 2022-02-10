@@ -1,105 +1,91 @@
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import {
+  FormGroup,
+  AbstractControl,
+  NgForm,
+  FormBuilder,
+  FormArray,
+  Validators,
+} from "@angular/forms";
 import {
   Component,
-  OnInit,
   Input,
   Output,
   EventEmitter,
-  OnDestroy
-} from '@angular/core';
-import { IHTMLFormControl } from 'src/app/lib/domain/components/dynamic-inputs/core';
-import { UIState } from 'src/app/lib/domain/components/ui-store/ui-state';
-import { Subscription } from 'rxjs';
-import { AlertConfig } from 'src/app/lib/domain/components/action-alert/app-alert/app-alert.component';
-import { SessionStorage } from 'src/app/lib/domain/storage/core/session-storage.service';
-import { HttpRequestConfigs } from 'src/app/lib/domain/http/core';
-import { isDefined } from 'src/app/lib/domain/utils/type-utils';
-import { AppUIStoreManager } from 'src/app/lib/domain/helpers/app-ui-store-manager.service';
-import { TranslationService } from 'src/app/lib/domain/translator/translator.service';
-import { DynamicControlParser } from 'src/app/lib/domain/helpers/dynamic-control-parser';
-import { ComponentReactiveFormHelpers } from 'src/app/lib/domain/helpers/component-reactive-form-helpers';
-
-// declare the variable require to use ad image path
-declare var require: any;
+  ChangeDetectionStrategy,
+  ViewChild,
+} from "@angular/core";
 
 @Component({
-  selector: 'app-login-view',
-  templateUrl: './login-view.component.html',
-  styleUrls: ['./login-view.component.css']
+  selector: "app-login-view",
+  templateUrl: "./login-view.component.html",
+  styleUrls: ["./login-view.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginViewComponent implements OnInit, OnDestroy {
+export class LoginViewComponent {
+  @Output() formSubmitted = new EventEmitter<object>();
+  @Output() loadRegistrationViewEvent = new EventEmitter<boolean>();
 
-  public elewouLogo = '/assets/images/logo-elewou-main.png';
-  // public elewouIcon = '/assets/images/icon-elewou.png';
+  public formGroup: FormGroup = this.builder.group({
+    username: this.builder.control(
+      undefined,
+      Validators.compose([Validators.maxLength(190), Validators.required])
+    ),
+    password: this.builder.control(
+      undefined,
+      Validators.compose([
+        Validators.required,
+        Validators.pattern(/((?=[a-zA-Z]*)(?=d*)(?=[~!@#$%^&*()/-_]*).{6,})/),
+      ])
+    ),
+  });
 
-  public componentFormGroup: FormGroup;
-  @Input() controlConfigs: IHTMLFormControl[];
-  @Output() formSubmitted: EventEmitter<object> = new EventEmitter<object>();
-  performingAction: boolean;
-  actionUiMessage: string;
-  uiStoreSubscriptions: Subscription[] = [];
-  @Input() public moduleName = 'Module name';
+  // tslint:disable-next-line: no-inferrable-types
+  @Input() performingAction: boolean = false;
+  // tslint:disable-next-line: no-inferrable-types
+  @Input() loggedIn: boolean = false;
+  @ViewChild("loginForm") loginForm!: NgForm;
+  @Input() public moduleName = "APPNAME";
+  @Input() logoAssetPath = "...";
+  @Input() hasRememberMe!: boolean;
 
   /**
-   * @description Component object instance initializer
-   * @param builder [[FormBuilder]] Angular ReactiveForm FormBuilder
-   * @param appUIStoreManager [[AppUIStoreManager]]
+   * Component object instance initializer
+   * @param builder
    */
-  constructor(
-    private builder: FormBuilder,
-    private controlsParser: DynamicControlParser,
-    public appUIStoreManager: AppUIStoreManager,
-    public cache: SessionStorage,
-    public translate: TranslationService
-  ) { }
+  constructor(private builder: FormBuilder) {}
 
-  get alertProperties(): AlertConfig {
-    return this.appUIStoreManager.alertConfigs;
-  }
-
-  ngOnInit() {
-    this.uiStoreSubscriptions.push(
-      this.appUIStoreManager.appUIStore.uiState.subscribe(
-        (uiState: UIState) => {
-          this.performingAction = uiState.performingAction;
-          this.actionUiMessage = uiState.uiMessage;
-        }
-      )
-    );
-    if (isDefined(this.cache.get(HttpRequestConfigs.sessionExpiredStorageKey))) {
-      this.translate.translate('sessionExpired').toPromise().then(translation => {
-        this.appUIStoreManager.completeActionWithError(translation);
-        setTimeout(() => {
-          this.appUIStoreManager.resetUIStore();
-          this.cache.delete(HttpRequestConfigs.sessionExpiredStorageKey);
-        }, 3000);
-      });
-    }
-  }
-
-  buildForm(): AbstractControl {
-    return this.controlsParser.buildFormGroupFromInputConfig(
-      this.controlConfigs
-    );
-  }
-
-  onFormSubmit() {
+  onFormSubmit(formGroup: FormGroup) {
     // Mark componentFormGroup controls as touched
-    ComponentReactiveFormHelpers.validateFormGroupFields(
-      this.componentFormGroup
-    );
+    this.validateFormGroupFields(formGroup);
     // Check if the formGroup is valid
-    if (this.componentFormGroup.valid) {
+    if (formGroup.valid) {
       // Fire formSubmitted event with the formGroup value
-      this.formSubmitted.emit(this.componentFormGroup.getRawValue());
-    } else {
-      // Show error message
+      this.formSubmitted.emit(formGroup.getRawValue());
     }
   }
 
-  ngOnDestroy() {
-    if (this.uiStoreSubscriptions.length > 0) {
-      this.uiStoreSubscriptions.map(subscription => subscription.unsubscribe());
+  private validateFormGroupFields(control: FormGroup | FormArray): void {
+    Object.keys(control.controls).forEach((field: string) => {
+      if (control.get(field) instanceof FormGroup) {
+        this.validateFormGroupFields(control.get(field) as FormGroup);
+      } else {
+        this.markControlAsTouched(control.get(field) || undefined, field);
+      }
+    });
+  }
+
+  private markControlAsTouched(
+    control?: AbstractControl,
+    field?: string
+  ): void {
+    if (control) {
+      control?.markAsTouched({ onlySelf: true });
+      control?.markAsDirty({ onlySelf: true });
+      control?.markAsPristine({ onlySelf: true });
     }
   }
+
+  onNavigateToRegistrationView = () => {
+    this.loadRegistrationViewEvent.emit(true);
+  };
 }

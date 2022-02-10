@@ -1,22 +1,60 @@
 <div class="login-wrapper">
-  <!-- <app-progress-bar [indeterminate]=true [hidden]="!performingAction" [overlay]="true"></app-progress-bar> -->
-  <div class="login-overlay" *ngIf="componentFormGroup">
-    <form class="login clr-form" [formGroup]="componentFormGroup" (ngSubmit)="onFormSubmit()">
+  <div class="login-overlay" *ngIf="formGroup">
+    <form
+      class="login clr-form"
+      #loginForm="ngForm"
+      [formGroup]="formGroup"
+      (ngSubmit)="onFormSubmit(formGroup)"
+    >
       <div class="login-group">
         <div class="title">
           <div class="login-logo">
-            <img [src]="elewouLogo" alt="ELEWOU" />
+            <img [src]="logoAssetPath" alt="EPAY WORKSPACE" />
           </div>
-          <span class="module-name"> {{ moduleName }} </span>
+          <span class="module-name">Connexion</span>
           <h5 class="hint" [translate]="'login.loginSubText'"></h5>
         </div>
-        <div class="form form-container" *ngIf="componentFormGroup">
-          <ng-container *ngFor="let value of controlConfigs">
-            <app-dynamic-inputs [control]="componentFormGroup.controls[value.formControlName]" [inputConfig]="value">
-            </app-dynamic-inputs>
-          </ng-container>
-          <button type="submit" class="btn btn-primary btn-block"><clr-icon shape="login"></clr-icon>{{ "login.loginBtnText" | translate }}</button>
-        </div>
+        <clr-input-container>
+          <label
+            class="clr-sr-only"
+            [translate]="'login.username.label'"
+          ></label>
+          <input
+            type="text"
+            name="username"
+            clrInput
+            [placeholder]="'login.username.label' | translate"
+            formControlName="username"
+          />
+        </clr-input-container>
+        <clr-password-container>
+          <label
+            class="clr-sr-only"
+            [translate]="'login.password.label'"
+          ></label>
+          <input
+            type="password"
+            name="password"
+            clrPassword
+            [placeholder]="'login.password.label' | translate"
+            formControlName="password"
+          />
+        </clr-password-container>
+        <clr-checkbox-wrapper *ngIf="hasRememberMe">
+          <label [translate]="'login.remember.label'"></label>
+          <input
+            type="checkbox"
+            name="remember"
+            clrCheckbox
+            formControlName="remember"
+          />
+        </clr-checkbox-wrapper>
+        <button
+          type="submit"
+          [disabled]="performingAction"
+          class="btn btn-primary"
+          [translate]="'login.loginBtnText'"
+        ></button>
         <div class="app-login-footer">
           <div class="app-login-logo-description">Powered by LIKSOFT</div>
         </div>
