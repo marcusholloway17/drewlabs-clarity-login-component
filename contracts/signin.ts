@@ -4,7 +4,7 @@ export interface SignInResultInterface {
     id: string|number;
     emails: string[];
     name: string;
-    photoUrl: string;
+    photoUrl?: string;
     firstName: string;
     lastName: string;
     authToken: string;

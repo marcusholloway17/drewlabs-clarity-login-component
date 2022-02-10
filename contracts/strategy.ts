@@ -4,9 +4,9 @@ import { SignInOptionsType, SignInResultInterface } from "./signin";
 export interface StrategyInterface {
   initialize(autologin?: boolean): Promise<void> | Observable<void> | void;
 
-  signInState$: Observable<SignInResultInterface>;
+  signInState$: Observable<SignInResultInterface|undefined>;
 
-  getLoginStatus(): Promise<SignInResultInterface>;
+  getLoginStatus(): Promise<SignInResultInterface|undefined>;
 
   signIn(options?: SignInOptionsType): Observable<boolean>;
 

@@ -11,7 +11,6 @@ import { lastValueFrom, Subject } from "rxjs";
 import { AuthServiceInterface } from "./contracts";
 import { AuthActions, AuthStrategies, AUTH_SERVICE } from "./constants";
 import { AuthService } from "./core/auth.service";
-
 @Component({
   selector: "app-login",
   template: `
@@ -28,15 +27,12 @@ import { AuthService } from "./core/auth.service";
 export class LoginComponent implements OnDestroy {
   // Properties definitions
   private destroy$ = new Subject<void>();
-
   private data: { [index: string]: any } = this.route.snapshot.data;
-
   // View text declarations
-  @Input() moduleName = this.data.moduleName;
-  loginHeadingText = this.data.loginHeadingText;
-  @Input() logoAssetPath = this.data.logoAssetPath;
-  @Input() hasRememberMe = this.data.hasRememberMe ?? false;
-
+  @Input() moduleName = this.data["moduleName"];
+  loginHeadingText = this.data["loginHeadingText"];
+  @Input() logoAssetPath = this.data["logoAssetPath"];
+  @Input() hasRememberMe = this.data["hasRememberMe"] ?? false;
   performingAction$ = (this.auth as AuthService)?.actionsState$.pipe(
     map((state) => {
       switch (state) {
@@ -50,7 +46,6 @@ export class LoginComponent implements OnDestroy {
       }
     })
   );
-
   constructor(
     public route: ActivatedRoute,
     @Inject(AUTH_SERVICE) private auth: AuthServiceInterface,
@@ -64,18 +59,16 @@ export class LoginComponent implements OnDestroy {
           if (state) {
             // TODO : NAVIGATE TO THE APPLICATION DASHBOARD
             setTimeout(() => {
-              this.router.navigateByUrl(`/${this.data.path}`);
+              this.router.navigateByUrl(`/${this.data["path"]}`);
             }, 300);
           }
         })
       )
       .subscribe();
   }
-
   // tslint:disable-next-line: typedef
   async onChildComponentFormSubmitted(event: { [index: string]: any }) {
     await lastValueFrom(this.auth.signIn(AuthStrategies.LOCAL, event));
   }
-
   ngOnDestroy = () => this.destroy$.next();
 }

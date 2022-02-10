@@ -37,7 +37,7 @@ const LOCAL_SIGNIN_RESULT_CACHE = "LOCAL_STRATEGY_SIGNIN_RESULT_CACHE";
 
 export class LocalStrategy implements StrategyInterface {
   // Properties definition
-  _signInState$ = new BehaviorSubject<SignInResultInterface>(undefined);
+  _signInState$ = new BehaviorSubject<SignInResultInterface|undefined>(undefined);
   signInState$ = this._signInState$.asObservable();
 
   private _request2FaConsent$ = new Subject<string>();
@@ -47,7 +47,7 @@ export class LocalStrategy implements StrategyInterface {
   constructor(
     private http: RequestClient,
     private host: string,
-    private cache: Storage = undefined
+    private cache?: Storage
   ) {}
 
   initialize(autologin?: boolean): Observable<void> {
@@ -57,7 +57,7 @@ export class LocalStrategy implements StrategyInterface {
   }
 
   getLoginStatus() {
-    return new Promise<SignInResultInterface>((resolve, reject) => {
+    return new Promise<SignInResultInterface|undefined>((resolve, reject) => {
       if (this.cache) {
         const value = this.cache.getItem(LOCAL_SIGNIN_RESULT_CACHE) as any;
         if (typeof value === "undefined" || value === null) {
@@ -142,7 +142,7 @@ export class LocalStrategy implements StrategyInterface {
       .pipe(
         map(() => {
           this._signInState$.next(undefined);
-          this.cache.removeItem(LOCAL_SIGNIN_RESULT_CACHE);
+          this.cache?.removeItem(LOCAL_SIGNIN_RESULT_CACHE);
           return true;
         })
       );
