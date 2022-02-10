@@ -29,11 +29,13 @@ export class LoginComponent implements OnDestroy {
   // Properties definitions
   private destroy$ = new Subject<void>();
 
+  private data: { [index: string]: any } = this.route.snapshot.data;
+
   // View text declarations
-  @Input() moduleName = this.route.snapshot.data.moduleName;
-  loginHeadingText = this.route.snapshot.data.loginHeadingText;
-  @Input() logoAssetPath = this.route.snapshot.data.logoAssetPath;
-  @Input() hasRememberMe = this.route.snapshot.data.hasRememberMe ?? false;
+  @Input() moduleName = this.data.moduleName;
+  loginHeadingText = this.data.loginHeadingText;
+  @Input() logoAssetPath = this.data.logoAssetPath;
+  @Input() hasRememberMe = this.data.hasRememberMe ?? false;
 
   performingAction$ = (this.auth as AuthService)?.actionsState$.pipe(
     map((state) => {
@@ -62,7 +64,7 @@ export class LoginComponent implements OnDestroy {
           if (state) {
             // TODO : NAVIGATE TO THE APPLICATION DASHBOARD
             setTimeout(() => {
-              this.router.navigateByUrl(`/${this.route.snapshot.data.path}`);
+              this.router.navigateByUrl(`/${this.data.path}`);
             }, 300);
           }
         })
