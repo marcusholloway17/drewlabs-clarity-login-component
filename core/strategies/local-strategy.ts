@@ -95,7 +95,6 @@ export class LocalStrategy implements StrategyInterface {
           ) {
             return of(false);
           }
-          console.log((state as Partial<SignInResultInterface>).authToken);
           return this.http
             .get(`${host(this.host)}/${LOCAL_API_GET_USER}`, {
               headers: {
