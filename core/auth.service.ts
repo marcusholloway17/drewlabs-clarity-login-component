@@ -48,9 +48,9 @@ export class AuthService
   private strategies = new Map<string, StrategyInterface>();
   private autologin = false;
 
-  private _signInResult: SignInResultInterface = undefined;
+  private _signInResult!: SignInResultInterface|undefined;
 
-  private _signInState$ = new ReplaySubject<SignInResultInterface>(1);
+  private _signInState$ = new ReplaySubject<SignInResultInterface|undefined>(1);
   /** An `Observable` that one can subscribe to get the current logged in user information */
   public signInState$ = this._signInState$
     .asObservable()
@@ -92,7 +92,7 @@ export class AuthService
     forkJoin(
       Array.from(this.strategies.entries()).map(([key, strategy]) => {
         return strategy.signInState$.pipe(
-          tap((signInResult: SignInResultInterface) => {
+          tap((signInResult) => {
             if (signInResult) {
               this._signInResult = { ...signInResult, provider: key };
               this._signInState$.next(this._signInResult);
@@ -152,15 +152,15 @@ export class AuthService
    */
   signIn(id: string, options?: any) {
     if (!this.initialized) {
-      throwError(() => new Error(ERR_NOT_INITIALIZED));
+      return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
     const strategy = this.strategies.get(id);
     if (typeof strategy === "undefined" || strategy === null) {
-      throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
+      return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
     this._actionsState$.next(AuthActions.ONGOING);
     this.handlers?.onPerformingAction();
-    return strategy.signIn(options).pipe(
+    return strategy?.signIn(options).pipe(
       tap((state) => {
         state
           ? this.handlers?.onAuthenticaltionSuccessful()

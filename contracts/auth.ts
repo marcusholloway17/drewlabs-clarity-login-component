@@ -8,7 +8,7 @@ export interface AuthStrategiesContainer {
   /**
    * @description Returns the strategy matching the user provided id or undefined if not found
    */
-  getStrategy(id: AuthStrategies): StrategyInterface;
+  getStrategy(id: AuthStrategies): StrategyInterface|undefined;
 }
 
 /**

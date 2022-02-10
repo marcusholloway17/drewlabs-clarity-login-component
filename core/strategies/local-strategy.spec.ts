@@ -32,7 +32,7 @@ describe("LocalStrategy", () => {
 
   it("#signIn should return an observable of true", async (done: DoneFn) => {
     client.setResponseType(ResponseTypes.AUTHENTICATED);
-    let loginState = undefined;
+    let loginState!: SignInResultInterface|undefined;
     service.signInState$
       .pipe(
         tap((state) => (loginState = state)),

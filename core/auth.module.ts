@@ -22,7 +22,7 @@ import { LocalStrategy } from "./strategies";
 export class StrategyBasedAuthModule {
   static forRoot(
     authResultHandlersProvider: Provider,
-    authConfigProvider: Provider = undefined
+    authConfigProvider?: Provider
   ): ModuleWithProviders<StrategyBasedAuthModule> {
     return {
       ngModule: StrategyBasedAuthModule,

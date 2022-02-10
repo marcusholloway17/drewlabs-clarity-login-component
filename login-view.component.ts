@@ -46,7 +46,7 @@ export class LoginViewComponent {
   @ViewChild("loginForm") loginForm!: NgForm;
   @Input() public moduleName = "APPNAME";
   @Input() logoAssetPath = "...";
-  @Input() hasRememberMe: boolean;
+  @Input() hasRememberMe!: boolean;
 
   /**
    * Component object instance initializer

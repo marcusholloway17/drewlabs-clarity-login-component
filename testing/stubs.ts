@@ -118,7 +118,9 @@ export class HttpClient implements RequestClient {
           authenticated: false,
         } as UnAuthenticatedResultInterface);
       default:
-        break;
+        return of({
+          authenticated: false,
+        } as UnAuthenticatedResultInterface);
     }
   }
   get(path: string, options?: { [index: string]: any }) {
