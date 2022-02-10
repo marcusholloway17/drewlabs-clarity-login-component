@@ -52,7 +52,9 @@ export class AuthService
 
   private _signInState$ = new ReplaySubject<SignInResultInterface>(1);
   /** An `Observable` that one can subscribe to get the current logged in user information */
-  public signInState$ = this._signInState$.asObservable();
+  public signInState$ = this._signInState$
+    .asObservable()
+    .pipe(tap(console.log));
 
   /* Consider making this an enum comprising LOADING, LOADED, FAILED etc. */
   private initialized = false;
@@ -181,18 +183,29 @@ export class AuthService
    */
   signOut(revoke: boolean = false) {
     if (!this.initialized) {
-      throwError(() => new Error(ERR_NOT_INITIALIZED));
+      this.onLoggedOut();
+      return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
-    if (!this._signInResult) {
-      throwError(() => new Error(ERR_NOT_INITIALIZED));
+    if (
+      typeof this._signInResult === "undefined" ||
+      this._signInResult === null
+    ) {
+      this.onLoggedOut();
+      return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
-    const strategy = this.strategies.get(this._signInResult.provider);
+    const strategy = this.strategies.get(this._signInResult?.provider);
     if (typeof strategy === "undefined" || strategy === null) {
-      throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
+      this.onLoggedOut();
+      return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
     this._actionsState$.next(AuthActions.ONGOING);
     return strategy.signOut(revoke).pipe(
-      tap(() => this._actionsState$.next(AuthActions.COMPLETE)),
+      tap((state) => {
+        this._actionsState$.next(AuthActions.COMPLETE);
+        if (state) {
+          this.onLoggedOut();
+        }
+      }),
       catchError((err) => {
         this._actionsState$.next(AuthActions.FAILED);
         this.handlers?.onError();
@@ -203,6 +216,12 @@ export class AuthService
 
   public getStrategy(id: AuthStrategies) {
     return this.strategies.get(id);
+  }
+
+  private onLoggedOut() {
+    this._signInState$.next(undefined);
+    this._signInResult = undefined;
+    this.handlers?.onLogout();
   }
 
   private applyConfigs(config: AuthServiceConfig) {

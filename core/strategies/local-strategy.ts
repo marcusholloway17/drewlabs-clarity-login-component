@@ -95,6 +95,7 @@ export class LocalStrategy implements StrategyInterface {
           ) {
             return of(false);
           }
+          console.log((state as Partial<SignInResultInterface>).authToken);
           return this.http
             .get(`${host(this.host)}/${LOCAL_API_GET_USER}`, {
               headers: {
@@ -139,6 +140,12 @@ export class LocalStrategy implements StrategyInterface {
       .get(`${host(this.host)}/${LOCAL_API_LOGOUT}`, {
         params: { revoke },
       })
-      .pipe(map((_) => true));
+      .pipe(
+        map(() => {
+          this._signInState$.next(undefined);
+          this.cache.removeItem(LOCAL_SIGNIN_RESULT_CACHE);
+          return true;
+        })
+      );
   }
 }

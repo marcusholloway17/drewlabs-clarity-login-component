@@ -27,9 +27,7 @@ export class AuthInterceptorService implements HttpInterceptor, OnDestroy {
         // Souscrire jusqu'a ce que le service ne soit détruit
         takeUntil(this._destroy$),
         tap((state) => {
-          if (state && state.authToken) {
-            this.token = state.authToken;
-          }
+          this.token = state?.authToken ?? undefined;
         })
       )
       .subscribe();

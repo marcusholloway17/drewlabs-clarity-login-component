@@ -8,7 +8,7 @@ import {
   CanLoad,
   Route,
 } from "@angular/router";
-import { Observable, Subject, tap } from "rxjs";
+import { interval, Observable, Subject, takeUntil, tap } from "rxjs";
 import { map } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
 import { AuthServiceInterface } from "../contracts";
@@ -19,11 +19,21 @@ export class AuthGuardService
 {
   // tslint:disable-next-line: variable-name
   private _destroy$ = new Subject<void>();
+  private _signedIn = false;
 
   constructor(
     private router: Router,
     @Inject(AUTH_SERVICE) private auth: AuthServiceInterface
-  ) {}
+  ) {
+    this.auth.signInState$
+      .pipe(
+        takeUntil(this._destroy$),
+        tap((state) => {
+          this._signedIn = state ? true : false;
+        })
+      )
+      .subscribe();
+  }
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -44,19 +54,14 @@ export class AuthGuardService
   }
 
   checkAuthStatus(url: string): Observable<boolean> {
-
-    // if (this.auth.signInResult) {
-
-    // }
-    return this.auth.signInState$.pipe(
-      map((state) => {
-        return state?.authToken ? true : false;
-      }),
-      tap((state) => {
-        if (state) {
-          return;
+    // Simulating a timeout for signin result to be available
+    return interval(100).pipe(
+      map(() => {
+        if (!this._signedIn) {
+          this.router.navigateByUrl("/login");
         }
-        this.router.navigateByUrl("/login");
+        console.log(this._signedIn);
+        return this._signedIn;
       })
     );
   }
