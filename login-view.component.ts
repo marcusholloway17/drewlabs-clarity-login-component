@@ -46,7 +46,8 @@ export class LoginViewComponent {
   @ViewChild("loginForm") loginForm!: NgForm;
 
   @Input() public moduleName;
-  public workspaceLogo = "app/lib/views/global-styles/assets/images/app-logo.png";
+  // public workspaceLogo = "app/lib/views/global-styles/assets/images/app-logo.png";
+  public workspaceLogo = "app/lib/views/global-styles/assets/images/smi-logo-large.png";
 
   /**
    * @description Component object instance initializer
