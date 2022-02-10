@@ -208,7 +208,7 @@ export class AuthService
       }),
       catchError((err) => {
         this._actionsState$.next(AuthActions.FAILED);
-        this.handlers?.onError();
+        this.onLoggedOut();
         return throwError(() => err);
       })
     );

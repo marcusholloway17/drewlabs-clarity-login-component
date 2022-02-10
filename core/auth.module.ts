@@ -10,6 +10,7 @@ import {
   AuthInterceptorService,
   AuthorizationsGuard,
   ClientAuthorizationInterceptor,
+  UnAuthorizedResponseInterceptorGuard,
 } from "../guards";
 import { HttpClient } from "../testing/stubs";
 import { AuthService } from "./auth.service";
@@ -55,6 +56,11 @@ export class StrategyBasedAuthModule {
           },
         },
         authResultHandlersProvider,
+        {
+          provide:  HTTP_INTERCEPTORS,
+          useClass: UnAuthorizedResponseInterceptorGuard,
+          multi: true
+        }
       ],
     };
   }
