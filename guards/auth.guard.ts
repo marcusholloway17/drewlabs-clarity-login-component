@@ -44,9 +44,13 @@ export class AuthGuardService
   }
 
   checkAuthStatus(url: string): Observable<boolean> {
+
+    // if (this.auth.signInResult) {
+
+    // }
     return this.auth.signInState$.pipe(
       map((state) => {
-        return state && state.authToken ? true : false;
+        return state?.authToken ? true : false;
       }),
       tap((state) => {
         if (state) {
