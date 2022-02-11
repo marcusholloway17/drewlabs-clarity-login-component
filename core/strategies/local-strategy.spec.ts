@@ -36,7 +36,6 @@ describe("LocalStrategy", () => {
     service.signInState$
       .pipe(
         tap((state) => (loginState = state)),
-        tap(console.log)
       )
       .subscribe();
     const result = await lastValueFrom(service.signIn());

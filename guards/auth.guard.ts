@@ -60,7 +60,6 @@ export class AuthGuardService
         if (!this._signedIn) {
           this.router.navigateByUrl("/login");
         }
-        console.log(this._signedIn);
         return this._signedIn;
       })
     );
@@ -83,7 +82,7 @@ export class AuthorizationsGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
     const url: string = state.url;
-    return this.isAuthorized(next.data['authorizations'], url);
+    return this.isAuthorized(next.data["authorizations"], url);
   }
 
   canActivateChild(
@@ -95,7 +94,10 @@ export class AuthorizationsGuard implements CanActivate {
 
   canLoad(route: Route): boolean | Observable<boolean> | Promise<boolean> {
     const url = `/${route.path}`;
-    return this.isAuthorized(route?.data ? route?.data['authorizations'] : [], url);
+    return this.isAuthorized(
+      route?.data ? route?.data["authorizations"] : [],
+      url
+    );
   }
 
   private isAuthorized(

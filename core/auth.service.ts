@@ -48,13 +48,13 @@ export class AuthService
   private strategies = new Map<string, StrategyInterface>();
   private autologin = false;
 
-  private _signInResult!: SignInResultInterface|undefined;
+  private _signInResult!: SignInResultInterface | undefined;
 
-  private _signInState$ = new ReplaySubject<SignInResultInterface|undefined>(1);
+  private _signInState$ = new ReplaySubject<SignInResultInterface | undefined>(
+    1
+  );
   /** An `Observable` that one can subscribe to get the current logged in user information */
-  public signInState$ = this._signInState$
-    .asObservable()
-    .pipe(tap(console.log));
+  public signInState$ = this._signInState$.asObservable();
 
   /* Consider making this an enum comprising LOADING, LOADED, FAILED etc. */
   private initialized = false;
