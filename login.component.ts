@@ -7,7 +7,7 @@ import {
   OnInit,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { mergeMap, takeUntil, tap, filter, map } from "rxjs/operators";
+import { mergeMap, takeUntil, tap, map } from "rxjs/operators";
 import { TRANSLATIONS, buildLoginFormControlObj } from "./constants";
 import { TranslationService } from "src/app/lib/core/translator";
 import { AuthService } from "src/app/lib/core/auth/core";
@@ -21,12 +21,11 @@ import { isDefined } from "src/app/lib/core/utils";
 import { doLog } from "src/app/lib/core/rxjs/operators";
 import { User, userCanAny } from "src/app/lib/core/auth/contracts/v2";
 import { IHTMLFormControl } from "src/app/lib/core/components/dynamic-inputs/core";
-import { AppUIStateProvider } from "src/app/lib/core/ui-state";
-import { UIStateStatusCode } from "src/app/lib/core/contracts/ui-state";
 import {
   ConfigurationManager,
   CONFIG_MANAGER,
 } from "src/app/lib/core/configuration";
+import { UIStateProvider, UIStateStatusCode, UI_STATE_PROVIDER } from "src/app/lib/core/ui-state";
 export interface ComponentState {
   translations: { [index: string]: any };
   controlConfigs: IHTMLFormControl[];
@@ -118,7 +117,7 @@ export class LoginComponent implements OnDestroy, OnInit {
 
   constructor(
     private translate: TranslationService,
-    private uiState: AppUIStateProvider,
+    @Inject(UI_STATE_PROVIDER) private uiState: UIStateProvider,
     public route: ActivatedRoute,
     private auth: AuthService,
     public readonly router: Router,
