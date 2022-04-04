@@ -2,14 +2,15 @@ import {
   HttpInterceptor,
   HttpRequest,
   HttpHandler,
-} from "@angular/common/http";
-import { Inject, Injectable, OnDestroy } from "@angular/core";
-import { Subject, takeUntil, tap } from "rxjs";
-import { AUTH_SERVICE } from "../constants";
-import { AuthServiceInterface } from "../contracts";
+} from '@angular/common/http';
+import { Inject, Injectable, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { AUTH_SERVICE } from '../constants';
+import { AuthServiceInterface } from '../contracts';
+import { takeUntil, tap } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthInterceptorService implements HttpInterceptor, OnDestroy {
   // Service destroy handler
@@ -42,7 +43,7 @@ export class AuthInterceptorService implements HttpInterceptor, OnDestroy {
       // Clone the request and replace the original headers with
       // cloned headers, updated with the authorization.
       req = req.clone({
-        headers: req.headers.set("Authorization", `Bearer ${this.token}`),
+        headers: req.headers.set('Authorization', `Bearer ${this.token}`),
       });
     }
     // Retrourner la prochaine exécution de la pile des middlewares

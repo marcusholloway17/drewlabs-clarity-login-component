@@ -8,10 +8,10 @@ import {
   CanLoad,
   Route,
 } from "@angular/router";
-import { interval, Observable, Subject, takeUntil, tap } from "rxjs";
-import { map } from "rxjs";
+import { interval, Observable, Subject, } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
 import { AuthServiceInterface } from "../contracts";
+import { map, takeUntil, tap  } from 'rxjs/operators';
 
 @Injectable()
 export class AuthGuardService
@@ -30,7 +30,7 @@ export class AuthGuardService
         takeUntil(this._destroy$),
         tap((state) => {
           this._signedIn = state ? true : false;
-        })
+        }),
       )
       .subscribe();
   }

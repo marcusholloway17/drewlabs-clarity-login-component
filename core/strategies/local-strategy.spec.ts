@@ -1,12 +1,11 @@
-import { tap } from "rxjs";
 import { SignInResultInterface } from "../../contracts";
 import { LocalStrategy } from "./local-strategy";
-import { lastValueFrom } from "rxjs";
 import {
   AUTHENTICATED_RESULT,
   HttpClient,
   ResponseTypes,
 } from "../../testing/stubs";
+import { tap } from "rxjs/operators";
 
 describe("LocalStrategy", () => {
   let service: LocalStrategy;
@@ -18,14 +17,14 @@ describe("LocalStrategy", () => {
 
   it("#signIn should return false", async (done: DoneFn) => {
     client.setResponseType(ResponseTypes.UNAUTHENTICATED);
-    const result = await lastValueFrom(service.signIn());
+    const result = await service.signIn().toPromise();
     expect(result).toBe(false);
     done();
   });
 
   it("#signIn should return false", async (done: DoneFn) => {
     client.setResponseType(ResponseTypes.LOCKED);
-    const result = await lastValueFrom(service.signIn());
+    const result = await service.signIn().toPromise();
     expect(result).toBe(false);
     done();
   });
@@ -38,7 +37,7 @@ describe("LocalStrategy", () => {
         tap((state) => (loginState = state)),
       )
       .subscribe();
-    const result = await lastValueFrom(service.signIn());
+    const result = await service.signIn().toPromise();
     expect(loginState).toEqual({
       ...AUTHENTICATED_RESULT,
       id: 1,
