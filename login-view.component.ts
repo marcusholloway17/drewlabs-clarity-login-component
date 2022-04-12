@@ -47,8 +47,10 @@ export class LoginViewComponent {
 
   @ViewChild("loginForm") loginForm: NgForm;
 
-  @Input() public moduleName = "Ressources humaines CNSS";
-  public elewouLogo = "/assets/images/logo-elewou-main.png";
+  @Input() public moduleName = "Ressources humaines";
+  // public elewouLogo = "/assets/images/logo-elewou-main.png";
+  public workspaceLogo = "app/lib/views/styles/assets/images/logo-sogehp-dogtalafie.png";
+
   /**
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
