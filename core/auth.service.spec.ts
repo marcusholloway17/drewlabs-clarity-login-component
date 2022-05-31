@@ -83,13 +83,12 @@ describe("LocalStrategy", () => {
   });
 
   it("#AuthService.signIn(AuthStrategies.LOCAL) notifies signInState$ observable on successful login", async (done: DoneFn) => {
-
     // TODO : Initialize variables
     client.setResponseType(ResponseTypes.AUTHENTICATED);
-    let signState: SignInResultInterface;
+    let signState!: SignInResultInterface;
     // TODO : Run Effects
     (authService as AuthServiceInterface).signInState$
-      .pipe(tap((state) => (signState = state)))
+      .pipe(tap((state) => (signState = state as SignInResultInterface)))
       .subscribe();
     // Subscribe to get the sign in state result
     await lastValueFrom(
