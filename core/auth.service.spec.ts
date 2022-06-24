@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { lastValueFrom, map, tap } from "rxjs";
+import { lastValueFrom, tap } from "rxjs";
 import {
   AuthStrategies,
   AUTH_SERVICE,
