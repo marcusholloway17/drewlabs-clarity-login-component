@@ -5,28 +5,27 @@ import {
   Inject,
   Optional,
   OnInit,
-} from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { mergeMap, takeUntil, tap, filter, map } from "rxjs/operators";
-import { TRANSLATIONS, buildLoginFormControlObj } from "./constants";
-import { TranslationService } from "src/app/lib/core/translator";
-import { AuthService } from "src/app/lib/core/auth/core";
-import { SessionStorage } from "src/app/lib/core/storage/core";
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { mergeMap, takeUntil, tap, filter, map } from 'rxjs/operators';
+import { TRANSLATIONS, buildLoginFormControlObj } from './constants';
+import { TranslationService } from 'src/app/lib/core/translator';
+import { AuthService } from 'src/app/lib/core/auth/core';
+import { SessionStorage } from 'src/app/lib/core/storage/core';
 import {
   createSubject,
   observableOf,
   timeout,
-} from "src/app/lib/core/rxjs/helpers";
-import { isDefined } from "src/app/lib/core/utils";
-import { doLog } from "src/app/lib/core/rxjs/operators";
-import { User, userCanAny } from "src/app/lib/core/auth/contracts/v2";
-import { IHTMLFormControl } from "src/app/lib/core/components/dynamic-inputs/core";
-import { AppUIStateProvider } from "src/app/lib/core/ui-state";
-import { UIStateStatusCode } from "src/app/lib/core/contracts/ui-state";
+} from 'src/app/lib/core/rxjs/helpers';
+import { isDefined } from 'src/app/lib/core/utils';
+import { User, userCanAny } from 'src/app/lib/core/auth/contracts/v2';
+import { IHTMLFormControl } from 'src/app/lib/core/components/dynamic-inputs/core';
+import { AppUIStateProvider } from 'src/app/lib/core/ui-state';
+import { UIStateStatusCode } from 'src/app/lib/core/contracts/ui-state';
 import {
   ConfigurationManager,
   CONFIG_MANAGER,
-} from "src/app/lib/core/configuration";
+} from 'src/app/lib/core/configuration';
 export interface ComponentState {
   translations: { [index: string]: any };
   controlConfigs: IHTMLFormControl[];
@@ -34,16 +33,16 @@ export interface ComponentState {
 }
 
 @Component({
-  selector: "app-login",
+  selector: 'app-login',
   template: `
     <ng-container *ngIf="loginViewState$ | async as state">
       <app-login-view
         [state]="{
-          controlConfigs: state?.controlConfigs,
+          controlConfigs: state.controlConfigs,
           username: username,
           password: password
         }"
-        [performingAction]="(uiState$ | async)?.performingAction"
+        [performingAction]="(uiState$ | async)?.performingAction || false"
         (formSubmitted)="onChildComponentFormSubmitted($event)"
         (loadRegistrationViewEvent)="router.navigateByUrl('/register')"
         [moduleName]="moduleName"
@@ -61,9 +60,7 @@ export class LoginComponent implements OnDestroy, OnInit {
   moduleName = this.route.snapshot.data.moduleName;
   loginHeadingText = this.route.snapshot.data.loginHeadingText;
   // Load translations
-  translations$ = this.translate
-    .translate(TRANSLATIONS)
-    .pipe(doLog("Translations loaded...."));
+  translations$ = this.translate.translate(TRANSLATIONS);
 
   loginViewState$ = this.translations$.pipe(
     mergeMap((source) =>
@@ -79,7 +76,7 @@ export class LoginComponent implements OnDestroy, OnInit {
         this.uiState.startAction();
       } else if (isDefined(state.isInitialState) && !state.isInitialState) {
         this.uiState.endAction(
-          "",
+          '',
           state.isLoggedIn
             ? UIStateStatusCode.AUTHENTICATED
             : UIStateStatusCode.UNAUTHENTICATED
@@ -92,7 +89,7 @@ export class LoginComponent implements OnDestroy, OnInit {
       if (
         !state?.signingOut &&
         !state?.authenticating &&
-        typeof state?.isInitialState !== "undefined" &&
+        typeof state?.isInitialState !== 'undefined' &&
         state?.isInitialState !== null &&
         state?.isInitialState !== true &&
         state.isLoggedIn &&
@@ -108,12 +105,12 @@ export class LoginComponent implements OnDestroy, OnInit {
     })
   );
 
-  isProduction: boolean = this.config?.get("production");
+  isProduction: boolean = this.config?.get('production');
   username: string = !this.isProduction
-    ? this.config?.get("dev.users.username")
+    ? this.config?.get('dev.users.username')
     : undefined;
   password: string = !this.isProduction
-    ? this.config?.get("dev.users.password")
+    ? this.config?.get('dev.users.password')
     : undefined;
 
   constructor(
@@ -129,7 +126,7 @@ export class LoginComponent implements OnDestroy, OnInit {
   ngOnInit(): void {
     // Component state observale
     // Checks for session expiration
-    if (this.cache.get("X_SESSION_EXPIRED")) {
+    if (this.cache.get('X_SESSION_EXPIRED')) {
       this.translations$
         .pipe(takeUntil(this.destroy$))
         .subscribe((translations) => {
@@ -139,7 +136,7 @@ export class LoginComponent implements OnDestroy, OnInit {
           );
           timeout(() => {
             this.uiState.endAction();
-            this.cache.delete("X_SESSION_EXPIRED");
+            this.cache.delete('X_SESSION_EXPIRED');
           }, 3000);
         });
     } else {
