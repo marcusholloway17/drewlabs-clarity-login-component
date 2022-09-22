@@ -68,7 +68,7 @@ export class LoginViewComponent {
     ComponentReactiveFormHelpers.validateFormGroupFields(formGroup);
     // Check if the formGroup is valid
     if (formGroup.valid) {
-      console.log("harry");
+      console.log("SLIM");
       // Fire formSubmitted event with the formGroup value
       this.formSubmitted.emit(formGroup.getRawValue());
     }
