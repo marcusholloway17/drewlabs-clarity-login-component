@@ -24,6 +24,7 @@ export interface ComponentState {
   template: `
     <ng-container *ngIf="loginViewState$ | async  as state">
     <app-login-view
+      [logo]="logo"
       [controlConfigs]="state.controlConfigs"
       [performingAction]="(uiState$ | async)?.performingAction"
       (formSubmitted)="onChildComponentFormSubmitted($event)"
@@ -37,6 +38,7 @@ export interface ComponentState {
 export class LoginComponent implements OnDestroy {
   private destroy$ = new Subject<{}>();
   moduleName = this.route.snapshot.data.moduleName;
+  logo = this.route.snapshot.data.logo ?? '/assets/images/app-logo.png';
   // Load translations
   translations$ = this.translate
     .translate(TRANSLATIONS).pipe(
