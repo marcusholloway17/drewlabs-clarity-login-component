@@ -1,5 +1,5 @@
-import { BehaviorSubject, Observable, of, Subject } from "rxjs";
-import { map, mergeMap } from "rxjs/operators";
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
 import {
   SignInOptionsType,
   SignInResultInterface,
@@ -8,9 +8,10 @@ import {
   SignInResult,
   UnAuthenticatedResultInterface,
   RequestClient,
-} from "../../contracts";
-import { host } from "../helpers";
+} from '../../contracts';
+import { host } from '../helpers';
 
+//#region Types
 type GetUserDetailsResult = {
   id: number | string;
   username: string;
@@ -27,28 +28,43 @@ type GetUserDetailsResult = {
   roles: string[];
 };
 
-const LOCAL_API_GET_USER = "auth/v2/user";
+type RESTInterfaceType = {
+  users: string;
+  signIn: string;
+  signOut: string;
+};
+//#endregion Types
 
-const LOCAL_API_LOGIN = "auth/v2/login";
+//#region Constants
+const LOCAL_SIGNIN_RESULT_CACHE = 'LOCAL_STRATEGY_SIGNIN_RESULT_CACHE';
 
-const LOCAL_API_LOGOUT = "auth/v2/logout";
-
-const LOCAL_SIGNIN_RESULT_CACHE = "LOCAL_STRATEGY_SIGNIN_RESULT_CACHE";
+const DEFAULT_ENDPOINTS = {
+  users: 'auth/v2/user',
+  signIn: 'auth/v2/login',
+  signOut: 'auth/v2/logout',
+};
+//#endregion Constants
 
 export class LocalStrategy implements StrategyInterface {
   // Properties definition
-  _signInState$ = new BehaviorSubject<SignInResultInterface|undefined>(undefined);
+  _signInState$ = new BehaviorSubject<SignInResultInterface | undefined>(
+    undefined
+  );
   signInState$ = this._signInState$.asObservable();
 
   private _request2FaConsent$ = new Subject<string>();
   request2FaConsent$ = this._request2FaConsent$.asObservable();
+  private endpoints: RESTInterfaceType;
 
   // Instance initializer
   constructor(
     private http: RequestClient,
     private host: string,
-    private cache?: Storage
-  ) {}
+    private cache?: Storage,
+    endpoints?: Partial<RESTInterfaceType>
+  ) {
+    this.endpoints = { ...(endpoints ?? {}), ...DEFAULT_ENDPOINTS };
+  }
 
   initialize(autologin?: boolean): Observable<void> {
     // TODO : If Auto-login is true, load the signIn result from the cache storage
@@ -57,13 +73,13 @@ export class LocalStrategy implements StrategyInterface {
   }
 
   getLoginStatus() {
-    return new Promise<SignInResultInterface|undefined>((resolve, reject) => {
+    return new Promise<SignInResultInterface | undefined>((resolve, reject) => {
       if (this.cache) {
         const value = this.cache.getItem(LOCAL_SIGNIN_RESULT_CACHE) as any;
-        if (typeof value === "undefined" || value === null) {
+        if (typeof value === 'undefined' || value === null) {
           return resolve(undefined);
         }
-        if (typeof value === "string") {
+        if (typeof value === 'string') {
           return resolve(JSON.parse(value) as SignInResultInterface);
         }
         return resolve(value);
@@ -74,29 +90,28 @@ export class LocalStrategy implements StrategyInterface {
 
   signIn(options?: SignInOptionsType) {
     return this.http
-      .post(`${host(this.host)}/${LOCAL_API_LOGIN}`, options)
+      .post(`${host(this.host)}/${this.endpoints.signIn}`, options)
       .pipe(
         mergeMap((state: SignInResult) => {
-          if ((state as DoubleAuthSignInResultInterface).is2faEnabled) {
-            this._request2FaConsent$.next(
-              (state as DoubleAuthSignInResultInterface).auth2faToken
-            );
+          let authState: SignInResult =
+            state as DoubleAuthSignInResultInterface;
+          if (authState.is2faEnabled) {
+            this._request2FaConsent$.next(authState.auth2faToken);
             return of(true);
           }
-
-          if (Boolean((state as UnAuthenticatedResultInterface).locked)) {
+          authState = state as UnAuthenticatedResultInterface;
+          if (Boolean(authState.locked)) {
             return of(false);
           }
-          const authenticated = (state as UnAuthenticatedResultInterface)
-            .authenticated;
+          const authenticated = authState.authenticated;
           if (
-            !(null === authenticated || typeof authenticated === "undefined") &&
+            !(null === authenticated || typeof authenticated === 'undefined') &&
             Boolean(authenticated) === false
           ) {
             return of(false);
           }
           return this.http
-            .get(`${host(this.host)}/${LOCAL_API_GET_USER}`, {
+            .get(`${host(this.host)}/${this.endpoints.users}`, {
               headers: {
                 Authorization: `Bearer ${
                   (state as Partial<SignInResultInterface>).authToken
@@ -118,8 +133,6 @@ export class LocalStrategy implements StrategyInterface {
                     address: user?.user_details?.address,
                   };
                   this._signInState$.next(result);
-
-                  // TODO : Add result details to cache for autologin
                   if (this.cache) {
                     this.cache.setItem(
                       LOCAL_SIGNIN_RESULT_CACHE,
@@ -136,7 +149,7 @@ export class LocalStrategy implements StrategyInterface {
 
   signOut(revoke?: boolean): Observable<boolean> {
     return this.http
-      .get(`${host(this.host)}/${LOCAL_API_LOGOUT}`, {
+      .get(`${host(this.host)}/${this.endpoints.users}`, {
         params: { revoke },
       })
       .pipe(
