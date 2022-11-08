@@ -116,5 +116,5 @@ export class LoginComponent implements OnDestroy {
     await this.auth.authenticate(Object.assign({}, event)).toPromise();
   }
 
-  ngOnDestroy = () => this.destroy$.next();
+  ngOnDestroy = () => this.destroy$.next('');
 }
