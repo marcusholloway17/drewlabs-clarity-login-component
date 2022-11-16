@@ -47,7 +47,7 @@ export class LoginViewComponent {
 
   @ViewChild("loginForm") loginForm: NgForm;
 
-  @Input() public moduleName = "Ressources humaines CNSS";
+  @Input() public moduleName = "Ressources Humaines";
   public elewouLogo = "/assets/images/logo-elewou-main.png";
   /**
    * @description Component object instance initializer
