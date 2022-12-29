@@ -50,7 +50,9 @@ export class LoginViewComponent {
 
   // Parameters
   @Input() public moduleName = "Ressources Humaines";
-  public appLogo = environment.assets.appLogo;
+  public appLogo = environment.company.appLogo;
+  public companyName = environment.company.name;
+
   /**
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder

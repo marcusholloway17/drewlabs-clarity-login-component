@@ -35,6 +35,7 @@ export interface ComponentState {
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class LoginComponent implements OnDestroy {
   private destroy$ = new Subject<{}>();
   moduleName = this.route.snapshot.data.moduleName;
