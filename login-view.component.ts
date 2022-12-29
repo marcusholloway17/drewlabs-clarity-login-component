@@ -1,3 +1,4 @@
+import { environment } from './../../../../environments/environment';
 import { FormGroup, AbstractControl, NgForm } from "@angular/forms";
 import {
   Component,
@@ -47,8 +48,9 @@ export class LoginViewComponent {
 
   @ViewChild("loginForm") loginForm: NgForm;
 
+  // Parameters
   @Input() public moduleName = "Ressources Humaines";
-  public elewouLogo = "/assets/images/logo-sogehp-normal.png";
+  public appLogo = environment.assets.appLogo;
   /**
    * @description Component object instance initializer
    * @param controlsParser [[DynamicControlParser]] Angular ReactiveForm FormBuilder
