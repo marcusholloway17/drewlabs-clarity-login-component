@@ -27,11 +27,11 @@ type GetUserDetailsResult = {
   roles: string[];
 };
 
-const LOCAL_API_GET_USER = "auth/v2/user";
+const LOCAL_API_GET_USER = "api/v2/user";
 
-const LOCAL_API_LOGIN = "auth/v2/login";
+const LOCAL_API_LOGIN = "api/v2/login";
 
-const LOCAL_API_LOGOUT = "auth/v2/logout";
+const LOCAL_API_LOGOUT = "api/v2/logout";
 
 const LOCAL_SIGNIN_RESULT_CACHE = "LOCAL_STRATEGY_SIGNIN_RESULT_CACHE";
 
