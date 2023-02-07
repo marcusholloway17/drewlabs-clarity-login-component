@@ -9,9 +9,9 @@
       <div class="login-group">
         <div class="title">
           <div class="login-logo">
-            <img [src]="logoAssetPath" alt="EPAY WORKSPACE" />
+            <img [src]="logoAssetPath" [alt]="companyName" />
           </div>
-          <span class="module-name">Connexion</span>
+          <span class="module-name">{{ moduleName}}</span>
           <h5 class="hint" [translate]="'login.loginSubText'"></h5>
         </div>
         <clr-input-container>

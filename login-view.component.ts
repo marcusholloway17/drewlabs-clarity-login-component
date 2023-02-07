@@ -1,3 +1,4 @@
+import { environment } from 'src/environments/environment';
 import {
   FormGroup,
   AbstractControl,
@@ -44,8 +45,9 @@ export class LoginViewComponent {
   // tslint:disable-next-line: no-inferrable-types
   @Input() loggedIn: boolean = false;
   @ViewChild("loginForm") loginForm!: NgForm;
-  @Input() public moduleName = "APPNAME";
-  @Input() logoAssetPath = "...";
+  @Input() public moduleName = "App Name";
+  @Input() public companyName = "Company Name";
+  @Input() logoAssetPath =  "...";
   @Input() hasRememberMe!: boolean;
 
   /**
