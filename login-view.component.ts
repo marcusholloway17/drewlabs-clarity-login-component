@@ -1,20 +1,19 @@
-import { environment } from 'src/environments/environment';
 import {
-  FormGroup,
-  AbstractControl,
-  NgForm,
-  FormBuilder,
-  FormArray,
-  Validators,
-} from "@angular/forms";
-import {
+  ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
   Output,
-  EventEmitter,
-  ChangeDetectionStrategy,
-  ViewChild,
+  ViewChild
 } from "@angular/core";
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  NgForm,
+  Validators
+} from "@angular/forms";
 
 @Component({
   selector: "app-login-view",
@@ -47,7 +46,7 @@ export class LoginViewComponent {
   @ViewChild("loginForm") loginForm!: NgForm;
   @Input() public moduleName = "App Name";
   @Input() public companyName = "Company Name";
-  @Input() logoAssetPath =  "...";
+  @Input() logoAssetPath = "...";
   @Input() hasRememberMe!: boolean;
 
   /**
