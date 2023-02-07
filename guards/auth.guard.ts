@@ -1,15 +1,10 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import {
-  CanActivate,
-  Router,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  CanActivateChild,
+  ActivatedRouteSnapshot, CanActivate, CanActivateChild,
   CanLoad,
-  Route,
+  Route, Router, RouterStateSnapshot
 } from "@angular/router";
-import { interval, Observable, Subject, takeUntil, tap } from "rxjs";
-import { map } from "rxjs";
+import { interval, map, Observable, Subject, takeUntil, tap } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
 import { AuthServiceInterface } from "../contracts";
 
@@ -67,43 +62,5 @@ export class AuthGuardService
 
   ngOnDestroy(): void {
     this._destroy$.next();
-  }
-}
-
-@Injectable()
-export class AuthorizationsGuard implements CanActivate {
-  constructor(
-    private router: Router,
-    @Inject(AUTH_SERVICE) private auth: AuthServiceInterface
-  ) {}
-
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> | Promise<boolean> | boolean {
-    const url: string = state.url;
-    return this.isAuthorized(next.data["authorizations"], url);
-  }
-
-  canActivateChild(
-    childRoute: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): boolean | Observable<boolean> | Promise<boolean> {
-    return this.canActivate(childRoute, state);
-  }
-
-  canLoad(route: Route): boolean | Observable<boolean> | Promise<boolean> {
-    const url = `/${route.path}`;
-    return this.isAuthorized(
-      route?.data ? route?.data["authorizations"] : [],
-      url
-    );
-  }
-
-  private isAuthorized(
-    authorizations: string[] | string,
-    url: string
-  ): Observable<boolean> | boolean | Promise<boolean> {
-    return true;
   }
 }

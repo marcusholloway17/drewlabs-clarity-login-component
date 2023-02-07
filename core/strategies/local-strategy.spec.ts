@@ -1,12 +1,11 @@
-import { tap } from "rxjs";
+import { lastValueFrom, tap } from "rxjs";
 import { SignInResultInterface } from "../../contracts";
-import { LocalStrategy } from "./local-strategy";
-import { lastValueFrom } from "rxjs";
 import {
-  AUTHENTICATED_RESULT,
-  HttpClient,
-  ResponseTypes,
+    AUTHENTICATED_RESULT,
+    HttpClient,
+    ResponseTypes
 } from "../../testing/stubs";
+import { LocalStrategy } from "./local/local-strategy";
 
 describe("LocalStrategy", () => {
   let service: LocalStrategy;

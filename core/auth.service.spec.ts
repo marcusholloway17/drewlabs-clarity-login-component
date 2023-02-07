@@ -1,23 +1,23 @@
 import { TestBed } from "@angular/core/testing";
 import { lastValueFrom, tap } from "rxjs";
 import {
-  AuthStrategies,
-  AUTH_SERVICE,
-  AUTH_SERVICE_CONFIG,
+    AuthStrategies,
+    AUTH_SERVICE,
+    AUTH_SERVICE_CONFIG
 } from "../constants";
 import {
-  AuthServiceConfig,
-  AuthServiceInterface,
-  AuthStrategiesContainer,
-  SignInResultInterface,
+    AuthServiceConfig,
+    AuthServiceInterface,
+    AuthStrategiesContainer,
+    SignInResultInterface
 } from "../contracts";
 import {
-  AUTHENTICATED_RESULT,
-  HttpClient,
-  ResponseTypes,
+    AUTHENTICATED_RESULT,
+    HttpClient,
+    ResponseTypes
 } from "../testing/stubs";
 import { AuthService } from "./auth.service";
-import { LocalStrategy } from "./strategies/local-strategy";
+import { LocalStrategy } from "./strategies/local/local-strategy";
 
 describe("LocalStrategy", () => {
   let client = new HttpClient();

@@ -3,14 +3,12 @@ import {
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
-  HttpRequest,
-  HttpResponse,
+  HttpRequest
 } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { catchError, lastValueFrom, Observable, tap, throwError } from "rxjs";
-import { AUTH_ACTION_HANDLERS, AUTH_SERVICE } from "../constants";
-import { AuthActionHandlers, AuthServiceInterface } from "../contracts";
+import { catchError, lastValueFrom, Observable, throwError } from "rxjs";
+import { AUTH_SERVICE } from "../constants";
+import { AuthServiceInterface } from "../contracts";
 
 @Injectable({
   providedIn: "root",

@@ -1,60 +1,50 @@
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, Subject } from "rxjs";
+import { map, mergeMap } from "rxjs/operators";
 import {
+  DoubleAuthSignInResultInterface,
+  RequestClient,
   SignInOptionsType,
+  SignInResult,
   SignInResultInterface,
   StrategyInterface,
-  DoubleAuthSignInResultInterface,
-  SignInResult,
-  UnAuthenticatedResultInterface,
-  RequestClient,
-} from '../../contracts';
-import { host } from '../helpers';
+  UnAuthenticatedResultInterface
+} from "../../../contracts";
+import { host } from "../../helpers";
+import { DEFAULT_ENDPOINTS, LOCAL_SIGNIN_RESULT_CACHE } from "./defaults";
+import { RESTInterfaceType, SingInResultType, UserInterface } from "./types";
 
-//#region Types
-type GetUserDetailsResult = {
-  id: number | string;
-  username: string;
-  user_details: {
-    firstname: string;
-    lastname: string;
-    address?: string;
-    phone_number?: string;
-    profile_url?: string;
-    emails: string[];
-  };
-  double_auth_active: boolean;
-  authorizations: string[];
-  roles: string[];
-};
-
-type RESTInterfaceType = {
-  users: string;
-  signIn: string;
-  signOut: string;
-};
-//#endregion Types
-
-//#region Constants
-const LOCAL_SIGNIN_RESULT_CACHE = 'LOCAL_STRATEGY_SIGNIN_RESULT_CACHE';
-
-const DEFAULT_ENDPOINTS = {
-  users: 'auth/v2/user',
-  signIn: 'auth/v2/login',
-  signOut: 'auth/v2/logout',
-};
-//#endregion Constants
-
+/**
+ * Local strategy provides interface for authenticating first party
+ * application users via bearer token.
+ * 
+ * **Note**
+ * Implementation flow is based on drewlabs identity web service. Provide
+ * your own implementation inspired by the current implementation  if
+ * using a service other that the service mention above.
+ * 
+ * **Note**
+ * By default, the strategy implementation use default routes prefixed by
+ * `/auth/v2`. To change the default behavior, pass the required endpoint
+ * as parameter to the constructor:
+ * 
+ * ```ts
+ * 
+ * 
+ * // Example using api/v2/ as prefix to authentication routes
+ * const strategy = new LocalStrategy(client, host, {
+ *    users: "api/v2/user",
+ *    signIn: "api/v2/login",
+ *    signOut: "api/v2/logout"
+ * })
+ * ```
+ */
 export class LocalStrategy implements StrategyInterface {
   // Properties definition
-  _signInState$ = new BehaviorSubject<SignInResultInterface | undefined>(
-    undefined
-  );
+  private _endpoints: RESTInterfaceType;
+  private _signInState$ = new BehaviorSubject<SingInResultType>(undefined);
   signInState$ = this._signInState$.asObservable();
-
   private _request2FaConsent$ = new Subject<string>();
   request2FaConsent$ = this._request2FaConsent$.asObservable();
-  private endpoints: RESTInterfaceType;
 
   // Instance initializer
   constructor(
@@ -63,7 +53,7 @@ export class LocalStrategy implements StrategyInterface {
     private cache?: Storage,
     endpoints?: Partial<RESTInterfaceType>
   ) {
-    this.endpoints = { ...(endpoints ?? {}), ...DEFAULT_ENDPOINTS };
+    this._endpoints = { ...(endpoints ?? {}), ...DEFAULT_ENDPOINTS };
   }
 
   initialize(autologin?: boolean): Observable<void> {
@@ -73,13 +63,13 @@ export class LocalStrategy implements StrategyInterface {
   }
 
   getLoginStatus() {
-    return new Promise<SignInResultInterface | undefined>((resolve, reject) => {
+    return new Promise<SingInResultType>((resolve, reject) => {
       if (this.cache) {
         const value = this.cache.getItem(LOCAL_SIGNIN_RESULT_CACHE) as any;
-        if (typeof value === 'undefined' || value === null) {
+        if (typeof value === "undefined" || value === null) {
           return resolve(undefined);
         }
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           return resolve(JSON.parse(value) as SignInResultInterface);
         }
         return resolve(value);
@@ -90,7 +80,7 @@ export class LocalStrategy implements StrategyInterface {
 
   signIn(options?: SignInOptionsType) {
     return this.http
-      .post(`${host(this.host)}/${this.endpoints.signIn}`, options)
+      .post(`${host(this.host)}/${this._endpoints.signIn}`, options)
       .pipe(
         mergeMap((state: SignInResult) => {
           let authState: SignInResult =
@@ -105,13 +95,13 @@ export class LocalStrategy implements StrategyInterface {
           }
           const authenticated = authState.authenticated;
           if (
-            !(null === authenticated || typeof authenticated === 'undefined') &&
+            !(null === authenticated || typeof authenticated === "undefined") &&
             Boolean(authenticated) === false
           ) {
             return of(false);
           }
           return this.http
-            .get(`${host(this.host)}/${this.endpoints.users}`, {
+            .get(`${host(this.host)}/${this._endpoints.users}`, {
               headers: {
                 Authorization: `Bearer ${
                   (state as Partial<SignInResultInterface>).authToken
@@ -119,7 +109,7 @@ export class LocalStrategy implements StrategyInterface {
               },
             })
             .pipe(
-              map((user: GetUserDetailsResult) => {
+              map((user: UserInterface) => {
                 if (state) {
                   const result = {
                     ...(state as SignInResultInterface),
@@ -149,7 +139,7 @@ export class LocalStrategy implements StrategyInterface {
 
   signOut(revoke?: boolean): Observable<boolean> {
     return this.http
-      .get(`${host(this.host)}/${this.endpoints.users}`, {
+      .get(`${host(this.host)}/${this._endpoints.users}`, {
         params: { revoke },
       })
       .pipe(

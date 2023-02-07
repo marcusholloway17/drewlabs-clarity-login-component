@@ -3,15 +3,14 @@ import { ModuleWithProviders, NgModule, Provider } from "@angular/core";
 import {
   AuthStrategies,
   AUTH_SERVICE,
-  AUTH_SERVICE_CONFIG,
+  AUTH_SERVICE_CONFIG
 } from "../constants";
 import {
-  AuthGuardService,
-  AuthInterceptorService,
-  AuthorizationsGuard,
-  ClientAuthorizationInterceptor,
-  UnAuthorizedResponseInterceptorGuard,
+  AuthGuardService, AuthInterceptorService, ClientAuthorizationInterceptor,
+  UnAuthorizedResponseInterceptorGuard
 } from "../guards";
+import { AnyScopeGuard } from "../guards/any-scope.guard";
+import { ScopeGuard } from "../guards/scopes.guard";
 import { HttpClient } from "../testing/stubs";
 import { AuthService } from "./auth.service";
 import { LocalStrategy } from "./strategies";
@@ -39,10 +38,11 @@ export class StrategyBasedAuthModule {
         {
           provide: HTTP_INTERCEPTORS,
           useClass: ClientAuthorizationInterceptor,
-          multi: true
+          multi: true,
         },
-        AuthorizationsGuard,
         AuthGuardService,
+        ScopeGuard,
+        AnyScopeGuard,
         authConfigProvider ?? {
           provide: AUTH_SERVICE_CONFIG,
           useValue: {
@@ -57,10 +57,10 @@ export class StrategyBasedAuthModule {
         },
         authResultHandlersProvider,
         {
-          provide:  HTTP_INTERCEPTORS,
+          provide: HTTP_INTERCEPTORS,
           useClass: UnAuthorizedResponseInterceptorGuard,
-          multi: true
-        }
+          multi: true,
+        },
       ],
     };
   }

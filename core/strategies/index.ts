@@ -1,1 +1,1 @@
-export { LocalStrategy } from './local-strategy';
+export { LocalStrategy } from './local/local-strategy';
