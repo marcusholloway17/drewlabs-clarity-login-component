@@ -1,25 +1,25 @@
-import { TestBed } from "@angular/core/testing";
-import { lastValueFrom, tap } from "rxjs";
+import { TestBed } from '@angular/core/testing';
 import {
   AuthStrategies,
   AUTH_SERVICE,
   AUTH_SERVICE_CONFIG,
-} from "../constants";
+} from '../constants';
 import {
   AuthServiceConfig,
   AuthServiceInterface,
   AuthStrategiesContainer,
   SignInResultInterface,
-} from "../contracts";
+} from '../contracts';
 import {
   AUTHENTICATED_RESULT,
   HttpClient,
   ResponseTypes,
-} from "../testing/stubs";
-import { AuthService } from "./auth.service";
-import { LocalStrategy } from "./strategies/local-strategy";
+} from '../testing/stubs';
+import { AuthService } from './auth.service';
+import { LocalStrategy } from './strategies/local-strategy';
+import { tap } from 'rxjs/operators';
 
-describe("LocalStrategy", () => {
+describe('LocalStrategy', () => {
   let client = new HttpClient();
   let authService: AuthServiceInterface | AuthStrategiesContainer;
 
@@ -34,7 +34,7 @@ describe("LocalStrategy", () => {
             strategies: [
               {
                 id: AuthStrategies.LOCAL,
-                strategy: new LocalStrategy(client, ""),
+                strategy: new LocalStrategy(client, ''),
               },
             ],
             autoLogin: true,
@@ -49,40 +49,40 @@ describe("LocalStrategy", () => {
     authService = TestBed.inject(AUTH_SERVICE);
   });
 
-  it("#inject when call on AUTH_SERVICE token must return an instance AuthService", (done: DoneFn) => {
+  it('#inject when call on AUTH_SERVICE token must return an instance AuthService', (done: DoneFn) => {
     expect(authService).toBeInstanceOf(AuthService);
     done();
   });
 
-  it("#AuthService.getProvider(AuthStrategies.LOCAL) should return an instance of LocalStrategy", (done: DoneFn) => {
+  it('#AuthService.getProvider(AuthStrategies.LOCAL) should return an instance of LocalStrategy', (done: DoneFn) => {
     expect(
       (authService as AuthStrategiesContainer).getStrategy(AuthStrategies.LOCAL)
     ).toBeInstanceOf(LocalStrategy);
     done();
   });
 
-  it("#AuthService.signIn(AuthStrategies.LOCAL) should return an observable of true", async (done: DoneFn) => {
+  it('#AuthService.signIn(AuthStrategies.LOCAL) should return an observable of true', async (done: DoneFn) => {
     client.setResponseType(ResponseTypes.AUTHENTICATED);
-    const result = await lastValueFrom(
-      (authService as AuthServiceInterface).signIn(AuthStrategies.LOCAL, {
-        username: "ADMIN",
-        password: "secret",
+    const result = await (authService as AuthServiceInterface)
+      .signIn(AuthStrategies.LOCAL, {
+        username: 'ADMIN',
+        password: 'secret',
       })
-    );
+      .toPromise();
     expect(result).toBe(true);
     done();
   });
 
-  it("#AuthService.signIn(AuthStrategies.LOCAL) should return an observable of false for empty body", async (done: DoneFn) => {
+  it('#AuthService.signIn(AuthStrategies.LOCAL) should return an observable of false for empty body', async (done: DoneFn) => {
     client.setResponseType(ResponseTypes.AUTHENTICATED);
-    const result = await lastValueFrom(
-      (authService as AuthServiceInterface).signIn(AuthStrategies.LOCAL, {})
-    );
+    const result = await (authService as AuthServiceInterface)
+      .signIn(AuthStrategies.LOCAL, {})
+      .toPromise();
     expect(result).toBe(false);
     done();
   });
 
-  it("#AuthService.signIn(AuthStrategies.LOCAL) notifies signInState$ observable on successful login", async (done: DoneFn) => {
+  it('#AuthService.signIn(AuthStrategies.LOCAL) notifies signInState$ observable on successful login', async (done: DoneFn) => {
     // TODO : Initialize variables
     client.setResponseType(ResponseTypes.AUTHENTICATED);
     let signState!: SignInResultInterface;
@@ -91,21 +91,21 @@ describe("LocalStrategy", () => {
       .pipe(tap((state) => (signState = state as SignInResultInterface)))
       .subscribe();
     // Subscribe to get the sign in state result
-    await lastValueFrom(
-      (authService as AuthServiceInterface).signIn(AuthStrategies.LOCAL, {
-        username: "ADMIN",
-        password: "secret",
+    await (authService as AuthServiceInterface)
+      .signIn(AuthStrategies.LOCAL, {
+        username: 'ADMIN',
+        password: 'secret',
       })
-    );
+      .toPromise();
     // TODO : Assert
     expect(signState).toEqual({
       ...AUTHENTICATED_RESULT,
       id: 1,
-      emails: ["contact@azlabs.tg"],
-      name: "APPSYSADMIN",
+      emails: ['contact@azlabs.tg'],
+      name: 'APPSYSADMIN',
       photoUrl: undefined,
-      firstName: "ADMIN",
-      lastName: "MASTER",
+      firstName: 'ADMIN',
+      lastName: 'MASTER',
       phoneNumber: undefined,
       address: undefined,
     } as SignInResultInterface);
