@@ -11,7 +11,7 @@ import {
 import { interval, Observable, Subject } from 'rxjs';
 import { AUTH_SERVICE } from '../constants';
 import { AuthServiceInterface, SignInResultInterface } from '../contracts';
-import { takeUntil, tap, map } from 'rxjs/operators';
+import { takeUntil, tap, map, first } from 'rxjs/operators';
 import { tokenCan, tokenCanAny } from '../core/helpers';
 
 @Injectable()
@@ -56,7 +56,8 @@ export class AuthGuardService
 
   checkAuthStatus(url: string): Observable<boolean> {
     // Simulating a timeout for signin result to be available
-    return interval(100).pipe(
+    return interval(300).pipe(
+      first(),
       map(() => {
         if (!this._signedIn) {
           this.router.navigateByUrl('/login');

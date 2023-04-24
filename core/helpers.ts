@@ -31,6 +31,12 @@ export function tokenCan(
   signInResult: RequiredProp<SignInResultInterface, 'scopes'>,
   ...scopes: string[]
 ) {
+  // Case the list of scopes is not provided we simply return true
+  if (scopes.length === 0) {
+    return true;
+  }
+
+  // Check for scopes and return result
   let result = true;
   const _scopes = signInResult.scopes ?? [];
 
@@ -60,6 +66,12 @@ export function tokenCanAny(
   signInResult: RequiredProp<SignInResultInterface, 'scopes'>,
   ...scopes: string[]
 ) {
+  // Case the list of scopes is not provided we simply return true
+  if (scopes.length === 0) {
+    return true;
+  }
+
+  // Check for scopes and return result
   let result = false;
   const _scopes = signInResult.scopes ?? [];
 

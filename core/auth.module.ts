@@ -34,16 +34,6 @@ export class StrategyBasedAuthModule {
           provide: AUTH_SERVICE,
           useClass: AuthService,
         },
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: AuthInterceptorService,
-          multi: true,
-        },
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: ClientAuthorizationInterceptor,
-          multi: true,
-        },
         AuthGuardService,
         TokenCanGuard,
         TokenCanAnyGuard,
@@ -60,6 +50,16 @@ export class StrategyBasedAuthModule {
           },
         },
         authResultHandlersProvider,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: AuthInterceptorService,
+          multi: true,
+        },
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: ClientAuthorizationInterceptor,
+          multi: true,
+        },
         {
           provide: HTTP_INTERCEPTORS,
           useClass: UnAuthorizedResponseInterceptorGuard,
