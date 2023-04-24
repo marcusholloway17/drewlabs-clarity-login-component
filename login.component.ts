@@ -15,7 +15,7 @@ import { AuthService } from "./core/auth.service";
   selector: "app-login",
   template: `
     <app-login-view
-      [performingAction]="(performingAction$ | async) ?? false"
+      [performingAction]="(performingAction$ | async) || false"
       (formSubmitted)="onChildComponentFormSubmitted($event)"
       (loadRegistrationViewEvent)="router.navigateByUrl('/register')"
       [moduleName]="moduleName"

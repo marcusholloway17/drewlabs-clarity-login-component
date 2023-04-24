@@ -1,23 +1,26 @@
-import { HTTP_INTERCEPTORS } from "@angular/common/http";
-import { ModuleWithProviders, NgModule, Provider } from "@angular/core";
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
 import {
   AuthStrategies,
   AUTH_SERVICE,
   AUTH_SERVICE_CONFIG,
-} from "../constants";
+} from '../constants';
 import {
   AuthGuardService,
   AuthInterceptorService,
-  AuthorizationsGuard,
+  TokenCanGuard,
   ClientAuthorizationInterceptor,
   UnAuthorizedResponseInterceptorGuard,
-} from "../guards";
-import { HttpClient } from "../testing/stubs";
-import { AuthService } from "./auth.service";
-import { LocalStrategy } from "./strategies";
+  TokenCanAnyGuard,
+} from '../guards';
+import { HttpClient } from '../testing/stubs';
+import { AuthService } from './auth.service';
+import { LocalStrategy } from './strategies';
+import { TokenCanAnyPipe, TokenCanPipe } from './pipes';
 
 @NgModule({
-  providers: [],
+  declarations: [TokenCanAnyPipe, TokenCanPipe],
+  exports: [TokenCanAnyPipe, TokenCanPipe],
 })
 export class StrategyBasedAuthModule {
   static forRoot(
@@ -39,17 +42,18 @@ export class StrategyBasedAuthModule {
         {
           provide: HTTP_INTERCEPTORS,
           useClass: ClientAuthorizationInterceptor,
-          multi: true
+          multi: true,
         },
-        AuthorizationsGuard,
         AuthGuardService,
+        TokenCanGuard,
+        TokenCanAnyGuard,
         authConfigProvider ?? {
           provide: AUTH_SERVICE_CONFIG,
           useValue: {
             strategies: [
               {
                 id: AuthStrategies.LOCAL,
-                strategy: new LocalStrategy(new HttpClient(), ""),
+                strategy: new LocalStrategy(new HttpClient(), ''),
               },
             ],
             autoLogin: true,
@@ -57,10 +61,10 @@ export class StrategyBasedAuthModule {
         },
         authResultHandlersProvider,
         {
-          provide:  HTTP_INTERCEPTORS,
+          provide: HTTP_INTERCEPTORS,
           useClass: UnAuthorizedResponseInterceptorGuard,
-          multi: true
-        }
+          multi: true,
+        },
       ],
     };
   }

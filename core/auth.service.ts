@@ -1,18 +1,13 @@
-import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
+import { Inject, Injectable, OnDestroy, Optional } from '@angular/core';
 import {
-  catchError,
   forkJoin,
   from,
   isObservable,
-  lastValueFrom,
   of,
   ReplaySubject,
-  startWith,
   Subject,
-  tap,
   throwError,
-  takeUntil,
-} from "rxjs";
+} from 'rxjs';
 import {
   AuthActions,
   AuthStrategies,
@@ -21,7 +16,7 @@ import {
   ERR_NOT_INITIALIZED,
   ERR_NOT_SUPPORTED_FOR_REFRESH_TOKEN,
   AUTH_ACTION_HANDLERS,
-} from "../constants";
+} from '../constants';
 import {
   AuthServiceConfig,
   SignInResultInterface,
@@ -29,17 +24,18 @@ import {
   AuthStrategiesContainer,
   AuthServiceInterface,
   AuthActionHandlers,
-} from "../contracts";
+} from '../contracts';
+import { catchError, startWith, takeUntil, tap } from 'rxjs/operators';
 
 const isPromise = (p: any) => {
-  return typeof p === "object" && typeof p.then === "function" ? true : false;
+  return typeof p === 'object' && typeof p.then === 'function' ? true : false;
 };
 
 const asObservable = (state: any) =>
   isObservable(state) ? state : isPromise(state) ? from(state) : of(state);
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthService
   implements AuthServiceInterface, AuthStrategiesContainer, OnDestroy
@@ -104,13 +100,11 @@ export class AuthService
       .pipe(takeUntil(this._destroy$))
       .subscribe();
     try {
-      await lastValueFrom(
-        forkJoin([
-          Array.from(this.strategies.values()).map((strategy) =>
-            asObservable(strategy.initialize(this.autologin))
-          ),
-        ])
-      );
+      await forkJoin([
+        Array.from(this.strategies.values()).map((strategy) =>
+          asObservable(strategy.initialize(this.autologin))
+        ),
+      ]).toPromise();
 
       if (this.autologin) {
         await Promise.all(
@@ -155,7 +149,7 @@ export class AuthService
       return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
     const strategy = this.strategies.get(id);
-    if (typeof strategy === "undefined" || strategy === null) {
+    if (typeof strategy === 'undefined' || strategy === null) {
       return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
     this._actionsState$.next(AuthActions.ONGOING);
@@ -187,14 +181,14 @@ export class AuthService
       return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
     if (
-      typeof this._signInResult === "undefined" ||
+      typeof this._signInResult === 'undefined' ||
       this._signInResult === null
     ) {
       this.onLoggedOut();
       return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
     const strategy = this.strategies.get(this._signInResult?.provider);
-    if (typeof strategy === "undefined" || strategy === null) {
+    if (typeof strategy === 'undefined' || strategy === null) {
       this.onLoggedOut();
       return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
