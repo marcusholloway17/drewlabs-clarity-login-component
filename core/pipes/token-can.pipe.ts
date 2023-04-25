@@ -21,6 +21,9 @@ export class TokenCanPipe implements PipeTransform {
     value: RequiredProp<SignInResultInterface, 'scopes'>,
     ...scopes: string[]
   ) {
+    if (typeof value === 'undefined' || value === null) {
+      return false;
+    }
     return tokenCan(value, ...scopes);
   }
 }
