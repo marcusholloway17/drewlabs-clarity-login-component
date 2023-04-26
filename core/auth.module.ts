@@ -1,22 +1,26 @@
-import { HTTP_INTERCEPTORS } from "@angular/common/http";
-import { ModuleWithProviders, NgModule, Provider } from "@angular/core";
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
 import {
-  AuthStrategies,
   AUTH_SERVICE,
-  AUTH_SERVICE_CONFIG
-} from "../constants";
+  AUTH_SERVICE_CONFIG,
+  AuthStrategies,
+} from '../constants';
 import {
-  AuthGuardService, AuthInterceptorService, ClientAuthorizationInterceptor,
-  UnAuthorizedResponseInterceptorGuard
-} from "../guards";
-import { AnyScopeGuard } from "../guards/any-scope.guard";
-import { ScopeGuard } from "../guards/scopes.guard";
-import { HttpClient } from "../testing/stubs";
-import { AuthService } from "./auth.service";
-import { LocalStrategy } from "./strategies";
+  AuthGuardService,
+  AuthInterceptorService,
+  ClientAuthorizationInterceptor,
+  TokenCanAnyGuard,
+  TokenCanGuard,
+  UnAuthorizedResponseInterceptorGuard,
+} from '../guards';
+import { HttpClient } from '../testing/stubs';
+import { AuthService } from './auth.service';
+import { TokenCanAnyPipe, TokenCanPipe } from './pipes';
+import { LocalStrategy } from './strategies';
 
 @NgModule({
-  providers: [],
+  declarations: [TokenCanAnyPipe, TokenCanPipe],
+  exports: [TokenCanAnyPipe, TokenCanPipe],
 })
 export class StrategyBasedAuthModule {
   static forRoot(
@@ -30,6 +34,22 @@ export class StrategyBasedAuthModule {
           provide: AUTH_SERVICE,
           useClass: AuthService,
         },
+        AuthGuardService,
+        TokenCanGuard,
+        TokenCanAnyGuard,
+        authConfigProvider ?? {
+          provide: AUTH_SERVICE_CONFIG,
+          useValue: {
+            strategies: [
+              {
+                id: AuthStrategies.LOCAL,
+                strategy: new LocalStrategy(new HttpClient(), ''),
+              },
+            ],
+            autoLogin: true,
+          },
+        },
+        authResultHandlersProvider,
         {
           provide: HTTP_INTERCEPTORS,
           useClass: AuthInterceptorService,
@@ -40,22 +60,6 @@ export class StrategyBasedAuthModule {
           useClass: ClientAuthorizationInterceptor,
           multi: true,
         },
-        AuthGuardService,
-        ScopeGuard,
-        AnyScopeGuard,
-        authConfigProvider ?? {
-          provide: AUTH_SERVICE_CONFIG,
-          useValue: {
-            strategies: [
-              {
-                id: AuthStrategies.LOCAL,
-                strategy: new LocalStrategy(new HttpClient(), ""),
-              },
-            ],
-            autoLogin: true,
-          },
-        },
-        authResultHandlersProvider,
         {
           provide: HTTP_INTERCEPTORS,
           useClass: UnAuthorizedResponseInterceptorGuard,

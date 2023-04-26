@@ -3,10 +3,11 @@ import {
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
-  HttpRequest
+  HttpRequest,
 } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { catchError, lastValueFrom, Observable, throwError } from "rxjs";
+import { Observable, throwError } from 'rxjs';
+import { catchError } from "rxjs/operators";
 import { AUTH_SERVICE } from "../constants";
 import { AuthServiceInterface } from "../contracts";
 
@@ -26,7 +27,7 @@ export class UnAuthorizedResponseInterceptorGuard implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((err) => {
         const handler = async () => {
-          return await lastValueFrom(this.auth.signOut());
+          return await this.auth.signOut().toPromise();
         };
         if (err instanceof HttpErrorResponse && err.status === 401) {
           handler();

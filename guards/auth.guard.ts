@@ -1,12 +1,18 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import {
-  ActivatedRouteSnapshot, CanActivate, CanActivateChild,
+  ActivatedRouteSnapshot,
+  CanActivate,
+  CanActivateChild,
   CanLoad,
-  Route, Router, RouterStateSnapshot
+  Route,
+  Router,
+  RouterStateSnapshot,
 } from "@angular/router";
-import { interval, map, Observable, Subject, takeUntil, tap } from "rxjs";
+import { Observable, Subject, interval } from "rxjs";
+import { first, map, takeUntil, tap } from "rxjs/operators";
 import { AUTH_SERVICE } from "../constants";
-import { AuthServiceInterface } from "../contracts";
+import { AuthServiceInterface, SignInResultInterface } from "../contracts";
+import { tokenCan, tokenCanAny } from "../core/helpers";
 
 @Injectable()
 export class AuthGuardService
@@ -17,8 +23,8 @@ export class AuthGuardService
   private _signedIn = false;
 
   constructor(
-    private router: Router,
-    @Inject(AUTH_SERVICE) private auth: AuthServiceInterface
+    @Inject(AUTH_SERVICE) private auth: AuthServiceInterface,
+    private router: Router
   ) {
     this.auth.signInState$
       .pipe(
@@ -30,29 +36,25 @@ export class AuthGuardService
       .subscribe();
   }
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.checkAuthStatus(state.url);
   }
 
-  canActivateChild(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> {
+  canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     return this.canActivate(route, state);
   }
 
-  canLoad(route: Route): Observable<boolean> {
+  canLoad(route: Route) {
     return this.checkAuthStatus(`/${route.path}`);
   }
 
-  checkAuthStatus(url: string): Observable<boolean> {
+  checkAuthStatus(url: string) {
     // Simulating a timeout for signin result to be available
-    return interval(100).pipe(
+    return interval(300).pipe(
+      first(),
       map(() => {
         if (!this._signedIn) {
+          return this.router.createUrlTree(["/login"]);
           this.router.navigateByUrl("/login");
         }
         return this._signedIn;
@@ -62,5 +64,131 @@ export class AuthGuardService
 
   ngOnDestroy(): void {
     this._destroy$.next();
+  }
+}
+
+@Injectable()
+export class TokenCanGuard implements CanActivate {
+  // #region Class properties
+  private _destroy$ = new Subject<void>();
+  private _signInResult!: Required<SignInResultInterface>;
+  // #endregion Class properties
+
+  /**
+   * Creates new class instance
+   *
+   * @param router
+   * @param auth
+   */
+  constructor(@Inject(AUTH_SERVICE) private auth: AuthServiceInterface) {
+    this.auth.signInState$
+      .pipe(
+        takeUntil(this._destroy$),
+        tap(
+          (state) =>
+            (this._signInResult = {
+              ...state,
+              scopes: state?.scopes ?? [],
+            } as Required<SignInResultInterface>)
+        )
+      )
+      .subscribe();
+  }
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    const url: string = state.url;
+    return this.can(next.data["authorizations"] ?? next.data["scopes"], url);
+  }
+
+  canActivateChild(
+    childRoute: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean | Observable<boolean> | Promise<boolean> {
+    return this.canActivate(childRoute, state);
+  }
+
+  canLoad(route: Route): boolean | Observable<boolean> | Promise<boolean> {
+    const url = `/${route.path}`;
+    return this.can(
+      route.data ? route.data["authorizations"] ?? route.data["scopes"] : [],
+      url
+    );
+  }
+
+  private can(scopes: string[] | string, url: string) {
+    if (
+      typeof this._signInResult === "undefined" ||
+      this._signInResult === null
+    ) {
+      return false;
+    }
+    const _scopes = typeof scopes === "string" ? [scopes] : scopes;
+    return tokenCan(this._signInResult, ..._scopes);
+  }
+}
+
+@Injectable()
+export class TokenCanAnyGuard implements CanActivate {
+  // #region Class properties
+  private _destroy$ = new Subject<void>();
+  private _signInResult!: Required<SignInResultInterface>;
+  // #endregion Class properties
+
+  /**
+   * Creates new class instance
+   *
+   * @param router
+   * @param auth
+   */
+  constructor(@Inject(AUTH_SERVICE) private auth: AuthServiceInterface) {
+    this.auth.signInState$
+      .pipe(
+        takeUntil(this._destroy$),
+        tap(
+          (state) =>
+            (this._signInResult = {
+              ...state,
+              scopes: state?.scopes ?? [],
+            } as Required<SignInResultInterface>)
+        )
+      )
+      .subscribe();
+  }
+
+  canActivate(
+    next: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> | Promise<boolean> | boolean {
+    const url: string = state.url;
+    return this.can(next.data["authorizations"] ?? next.data["scopes"], url);
+  }
+
+  canActivateChild(
+    childRoute: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean | Observable<boolean> | Promise<boolean> {
+    return this.canActivate(childRoute, state);
+  }
+
+  canLoad(route: Route): boolean | Observable<boolean> | Promise<boolean> {
+    const url = `/${route.path}`;
+    return this.can(
+      route.data ? route.data["authorizations"] ?? route.data["scopes"] : [],
+      url
+    );
+  }
+
+  private can(scopes: string[] | string, url: string) {
+    if (
+      typeof this._signInResult === "undefined" ||
+      this._signInResult === null
+    ) {
+      return false;
+    }
+    const _scopes = typeof scopes === "string" ? [scopes] : scopes;
+    return tokenCanAny(this._signInResult, ..._scopes);
   }
 }

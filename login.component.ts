@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { map, tap } from "rxjs/operators";
-import { lastValueFrom, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import { AuthServiceInterface } from "./contracts";
 import { AuthActions, AuthStrategies, AUTH_SERVICE } from "./constants";
 import { AuthService } from "./core/auth.service";
@@ -15,7 +15,7 @@ import { AuthService } from "./core/auth.service";
   selector: "app-login",
   template: `
     <app-login-view
-      [performingAction]="(performingAction$ | async) ?? false"
+      [performingAction]="(performingAction$ | async) || false"
       (formSubmitted)="onChildComponentFormSubmitted($event)"
       (loadRegistrationViewEvent)="router.navigateByUrl('/register')"
       [moduleName]="moduleName"
@@ -67,7 +67,7 @@ export class LoginComponent implements OnDestroy {
   }
   // tslint:disable-next-line: typedef
   async onChildComponentFormSubmitted(event: { [index: string]: any }) {
-    await lastValueFrom(this.auth.signIn(AuthStrategies.LOCAL, event));
+    await this.auth.signIn(AuthStrategies.LOCAL, event).toPromise();
   }
   ngOnDestroy = () => this.destroy$.next();
 }

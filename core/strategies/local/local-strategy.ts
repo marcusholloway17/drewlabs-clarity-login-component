@@ -40,7 +40,7 @@ import { RESTInterfaceType, SingInResultType, UserInterface } from "./types";
  */
 export class LocalStrategy implements StrategyInterface {
   // Properties definition
-  private _endpoints: RESTInterfaceType;
+  private endpoints: RESTInterfaceType;
   private _signInState$ = new BehaviorSubject<SingInResultType>(undefined);
   signInState$ = this._signInState$.asObservable();
   private _request2FaConsent$ = new Subject<string>();
@@ -53,7 +53,7 @@ export class LocalStrategy implements StrategyInterface {
     private cache?: Storage,
     endpoints?: Partial<RESTInterfaceType>
   ) {
-    this._endpoints = { ...(endpoints ?? {}), ...DEFAULT_ENDPOINTS };
+    this.endpoints = { ...DEFAULT_ENDPOINTS, ...(endpoints ?? {}) };
   }
 
   initialize(autologin?: boolean): Observable<void> {
@@ -80,7 +80,7 @@ export class LocalStrategy implements StrategyInterface {
 
   signIn(options?: SignInOptionsType) {
     return this.http
-      .post(`${host(this.host)}/${this._endpoints.signIn}`, options)
+      .post(`${host(this.host)}/${this.endpoints.signIn}`, options)
       .pipe(
         mergeMap((state: SignInResult) => {
           let authState: SignInResult =
@@ -101,7 +101,7 @@ export class LocalStrategy implements StrategyInterface {
             return of(false);
           }
           return this.http
-            .get(`${host(this.host)}/${this._endpoints.users}`, {
+            .get(`${host(this.host)}/${this.endpoints.users}`, {
               headers: {
                 Authorization: `Bearer ${
                   (state as Partial<SignInResultInterface>).authToken
@@ -139,7 +139,7 @@ export class LocalStrategy implements StrategyInterface {
 
   signOut(revoke?: boolean): Observable<boolean> {
     return this.http
-      .get(`${host(this.host)}/${this._endpoints.users}`, {
+      .get(`${host(this.host)}/${this.endpoints.users}`, {
         params: { revoke },
       })
       .pipe(

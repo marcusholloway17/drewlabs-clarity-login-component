@@ -16,5 +16,7 @@ export {
 } from "./auth";
 
 export { RequestClient } from "./request";
-
 export { AuthClientConfig } from './clients';
+
+// Type utilities
+export { RequiredProp } from './utils';
