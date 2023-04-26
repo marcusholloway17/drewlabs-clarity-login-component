@@ -5,7 +5,7 @@ import {
   HttpClient,
   ResponseTypes,
 } from '../../testing/stubs';
-import { LocalStrategy } from './local-strategy';
+import { LocalStrategy } from './local/local-strategy';
 
 describe('LocalStrategy', () => {
   let service: LocalStrategy;

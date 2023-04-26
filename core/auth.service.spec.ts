@@ -17,7 +17,7 @@ import {
   ResponseTypes,
 } from '../testing/stubs';
 import { AuthService } from './auth.service';
-import { LocalStrategy } from './strategies/local-strategy';
+import { LocalStrategy } from './strategies';
 
 describe('LocalStrategy', () => {
   let client = new HttpClient();

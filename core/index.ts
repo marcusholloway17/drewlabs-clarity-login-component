@@ -22,7 +22,7 @@ export { TokenCanAnyPipe, TokenCanPipe } from './pipes';
 // RxJS operators
 export { tokenCan$, tokenCanAny$ } from './rx';
 // Strategies exports
-export { LocalStrategy } from './strategies/local-strategy';
+export { LocalStrategy } from './strategies';
 
 
 
