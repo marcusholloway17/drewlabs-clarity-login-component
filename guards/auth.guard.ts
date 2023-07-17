@@ -1,13 +1,5 @@
 import { Inject, Injectable, OnDestroy } from "@angular/core";
-import {
-  ActivatedRouteSnapshot,
-  CanActivate,
-  CanActivateChild,
-  CanLoad,
-  Route,
-  Router,
-  RouterStateSnapshot,
-} from "@angular/router";
+import { ActivatedRouteSnapshot, Route, Router, RouterStateSnapshot } from "@angular/router";
 import { Observable, Subject, interval } from "rxjs";
 import { first, map, takeUntil, tap } from "rxjs/operators";
 import { AUTH_SERVICE } from "../constants";
@@ -16,7 +8,7 @@ import { tokenCan, tokenCanAny } from "../core/helpers";
 
 @Injectable()
 export class AuthGuardService
-  implements CanActivate, CanActivateChild, CanLoad, OnDestroy
+   implements OnDestroy
 {
   // tslint:disable-next-line: variable-name
   private _destroy$ = new Subject<void>();
@@ -68,7 +60,7 @@ export class AuthGuardService
 }
 
 @Injectable()
-export class TokenCanGuard implements CanActivate {
+export class TokenCanGuard  {
   // #region Class properties
   private _destroy$ = new Subject<void>();
   private _signInResult!: Required<SignInResultInterface>;
@@ -131,7 +123,7 @@ export class TokenCanGuard implements CanActivate {
 }
 
 @Injectable()
-export class TokenCanAnyGuard implements CanActivate {
+export class TokenCanAnyGuard  {
   // #region Class properties
   private _destroy$ = new Subject<void>();
   private _signInResult!: Required<SignInResultInterface>;
