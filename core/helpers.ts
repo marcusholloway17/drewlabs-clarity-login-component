@@ -1,4 +1,4 @@
-import { RequiredProp, SignInResultInterface } from '../contracts';
+import { RequiredProp, SignInResultInterface } from '../types';
 
 /**
  * @description Get the host part of a given URL

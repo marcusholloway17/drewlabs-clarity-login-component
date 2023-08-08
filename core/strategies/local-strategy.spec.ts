@@ -1,5 +1,5 @@
 import { tap } from 'rxjs/operators';
-import { SignInResultInterface } from '../../contracts';
+import { SignInResultInterface } from '../../types';
 import {
   AUTHENTICATED_RESULT,
   HttpClient,

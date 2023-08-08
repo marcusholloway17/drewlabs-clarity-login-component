@@ -10,7 +10,7 @@ import {
   AuthServiceInterface,
   AuthStrategiesContainer,
   SignInResultInterface,
-} from '../contracts';
+} from '../types';
 import {
   AUTHENTICATED_RESULT,
   HttpClient,

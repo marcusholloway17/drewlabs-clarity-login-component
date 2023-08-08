@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { RequiredProp, SignInResultInterface } from '../contracts';
+import { RequiredProp, SignInResultInterface } from '../types';
 import { map } from 'rxjs/operators';
 import { tokenCan, tokenCanAny } from './helpers';
 

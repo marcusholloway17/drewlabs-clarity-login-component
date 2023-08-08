@@ -10,8 +10,8 @@ import {
 } from "@angular/router";
 import { interval, map, Observable, Subject, take, takeUntil, tap } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
-import { AuthServiceInterface } from "../contracts";
-import { TokenGuardType } from "../contracts/guards";
+import { AuthServiceInterface } from "../types";
+import { TokenGuardType } from "../types/guards";
 
 @Injectable()
 export class ScopeGuard

@@ -12,5 +12,3 @@ export {
 } from "./auth";
 
 export { AuthStrategies } from "./strategies";
-
-export { AUTH_CLIENT_CONFIG } from './clients';

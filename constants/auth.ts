@@ -1,5 +1,5 @@
 import { InjectionToken } from "@angular/core";
-import { AuthActionHandlers, AuthServiceConfig, AuthServiceInterface } from "../contracts";
+import { AuthActionHandlers, AuthServiceConfig, AuthServiceInterface } from "../types";
 
 export const ERR_LOGIN_STRATEGY_NOT_FOUND = "AUTH STRATEGY NOT FOUND";
 export const ERR_NOT_LOGGED_IN = "NOT LOGGED IN";

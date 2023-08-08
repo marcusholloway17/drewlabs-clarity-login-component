@@ -1,10 +1,6 @@
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ModuleWithProviders, NgModule, Provider } from '@angular/core';
-import {
-  AUTH_SERVICE,
-  AUTH_SERVICE_CONFIG,
-  AuthStrategies,
-} from '../constants';
+import { HTTP_INTERCEPTORS } from "@angular/common/http";
+import { ModuleWithProviders, NgModule, Provider } from "@angular/core";
+import { AUTH_SERVICE, AUTH_SERVICE_CONFIG } from "../constants";
 import {
   AuthGuardService,
   AuthInterceptorService,
@@ -12,11 +8,9 @@ import {
   TokenCanAnyGuard,
   TokenCanGuard,
   UnAuthorizedResponseInterceptorGuard,
-} from '../guards';
-import { HttpClient } from '../testing/stubs';
-import { AuthService } from './auth.service';
-import { TokenCanAnyPipe, TokenCanPipe } from './pipes';
-import { LocalStrategy } from './strategies';
+} from "../guards";
+import { AuthService } from "./auth.service";
+import { TokenCanAnyPipe, TokenCanPipe } from "./pipes";
 
 @NgModule({
   declarations: [TokenCanAnyPipe, TokenCanPipe],
@@ -34,37 +28,15 @@ export class StrategyBasedAuthModule {
           provide: AUTH_SERVICE,
           useClass: AuthService,
         },
-        AuthGuardService,
-        TokenCanGuard,
-        TokenCanAnyGuard,
         authConfigProvider ?? {
           provide: AUTH_SERVICE_CONFIG,
           useValue: {
-            strategies: [
-              {
-                id: AuthStrategies.LOCAL,
-                strategy: new LocalStrategy(new HttpClient(), ''),
-              },
-            ],
+            // Do not provide any strategy
+            strategies: [],
             autoLogin: true,
           },
         },
         authResultHandlersProvider,
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: AuthInterceptorService,
-          multi: true,
-        },
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: ClientAuthorizationInterceptor,
-          multi: true,
-        },
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: UnAuthorizedResponseInterceptorGuard,
-          multi: true,
-        },
       ],
     };
   }

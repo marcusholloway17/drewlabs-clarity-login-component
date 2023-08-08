@@ -24,7 +24,7 @@ import {
   AuthStrategiesContainer,
   AuthServiceInterface,
   AuthActionHandlers,
-} from '../contracts';
+} from '../types';
 import { catchError, startWith, takeUntil, tap } from 'rxjs/operators';
 
 const isPromise = (p: any) => {

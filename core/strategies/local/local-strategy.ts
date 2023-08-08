@@ -7,29 +7,34 @@ import {
   SignInResult,
   SignInResultInterface,
   StrategyInterface,
-  UnAuthenticatedResultInterface
-} from "../../../contracts";
+  UnAuthenticatedResultInterface,
+} from "../../../types";
 import { host } from "../../helpers";
 import { DEFAULT_ENDPOINTS, LOCAL_SIGNIN_RESULT_CACHE } from "./defaults";
-import { RESTInterfaceType, SingInResultType, UserInterface } from "./types";
+import {
+  AuthClientConfig,
+  RESTInterfaceType,
+  SingInResultType,
+  UserInterface,
+} from "./types";
 
 /**
  * Local strategy provides interface for authenticating first party
  * application users via bearer token.
- * 
+ *
  * **Note**
  * Implementation flow is based on drewlabs identity web service. Provide
  * your own implementation inspired by the current implementation  if
  * using a service other that the service mention above.
- * 
+ *
  * **Note**
  * By default, the strategy implementation use default routes prefixed by
  * `/auth/v2`. To change the default behavior, pass the required endpoint
  * as parameter to the constructor:
- * 
+ *
  * ```ts
- * 
- * 
+ *
+ *
  * // Example using api/v2/ as prefix to authentication routes
  * const strategy = new LocalStrategy(client, host, {
  *    users: "api/v2/user",
@@ -51,7 +56,8 @@ export class LocalStrategy implements StrategyInterface {
     private http: RequestClient,
     private host: string,
     private cache?: Storage,
-    endpoints?: Partial<RESTInterfaceType>
+    endpoints?: Partial<RESTInterfaceType>,
+    authClientConfig?: AuthClientConfig
   ) {
     this.endpoints = { ...DEFAULT_ENDPOINTS, ...(endpoints ?? {}) };
   }

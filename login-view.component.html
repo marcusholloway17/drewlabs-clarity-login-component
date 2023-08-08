@@ -3,28 +3,28 @@
     <form class="login clr-form" #loginForm="ngForm" [formGroup]="formGroup" (ngSubmit)="onFormSubmit(formGroup)">
       <div class="login-group">
         <div class="title">
-          <div class="login-logo">
+          <div class="login-logo" *ngIf="logoAssetPath">
             <img alt="application-logo" [src]="logoAssetPath" [alt]="companyName" />
           </div>
           <span class="module-name">{{ moduleName}}</span>
-          <h5 class="hint" [translate]="'login.loginSubText'"></h5>
+          <h5 class="hint">{{ 'login.loginSubText' | uiText}}</h5>
         </div>
         <clr-input-container>
-          <label class="clr-sr-only" [translate]="'login.username.label'"></label>
+          <label class="clr-sr-only">{{ 'login.username.label' | uiText}}</label>
           <input aria-label="username" type="text" name="username" clrInput
-            [placeholder]="'login.username.label' | translate" formControlName="username" />
+            [placeholder]="'login.username.label' | uiText" formControlName="username" />
         </clr-input-container>
         <clr-password-container>
-          <label class="clr-sr-only" [translate]="'login.password.label'"></label>
+          <label class="clr-sr-only">{{'login.password.label' | uiText}}</label>
           <input aria-label="password" type="password" name="password" clrPassword
-            [placeholder]="'login.password.label' | translate" formControlName="password" />
+            [placeholder]="'login.password.label' | uiText" formControlName="password" />
         </clr-password-container>
         <clr-checkbox-wrapper *ngIf="hasRememberMe">
-          <label [translate]="'login.remember.label'"></label>
+          <label>{{ 'login.remember.label'| uiText}}</label>
           <input aria-label="remember-me" type="checkbox" name="remember" clrCheckbox formControlName="remember" />
         </clr-checkbox-wrapper>
-        <button title="sumit-button" type="submit" [disabled]="performingAction" class="btn btn-primary"
-          [translate]="'login.loginBtnText'"></button>
+        <button title="sumit-button" type="submit" [disabled]="performingAction" class="btn btn-primary">{{
+          'login.loginBtnText' | uiText}}</button>
         <div class="app-login-footer">
           <div class="app-login-logo-description">Powered by LIKSOFT</div>
         </div>

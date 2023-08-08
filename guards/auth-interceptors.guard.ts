@@ -6,7 +6,7 @@ import {
 import { Inject, Injectable, OnDestroy } from "@angular/core";
 import { Subject } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
-import { AuthServiceInterface } from "../contracts";
+import { AuthServiceInterface } from "../types";
 import { takeUntil, tap } from 'rxjs/operators';
 
 @Injectable({

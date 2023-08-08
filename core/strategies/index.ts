@@ -1,1 +1,6 @@
-export { LocalStrategy } from './local/local-strategy';
+export {
+  LocalStrategy,
+  useLocalStrategy,
+  AUTH_CLIENT_CONFIG,
+  AuthClientConfig,
+} from "./local";

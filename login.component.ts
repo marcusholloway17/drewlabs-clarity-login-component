@@ -8,7 +8,7 @@ import {
 import { ActivatedRoute, Router } from "@angular/router";
 import { map, tap } from "rxjs/operators";
 import { Subject } from "rxjs";
-import { AuthServiceInterface } from "./contracts";
+import { AuthServiceInterface } from "./types";
 import { AuthActions, AuthStrategies, AUTH_SERVICE } from "./constants";
 import { AuthService } from "./core/auth.service";
 @Component({

@@ -1,6 +1,6 @@
 //#region Types
 
-import { SignInResultInterface } from "../../../contracts";
+import { SignInResultInterface } from "../../../types";
 
 /**
  * Type declaration for token user query result
@@ -35,4 +35,13 @@ export type RESTInterfaceType = {
 };
 
 export type SingInResultType = SignInResultInterface | undefined;
+
+/**
+ * Auth clients configuration type declarations
+ */
+export type AuthClientConfig = {
+  id: string;
+  secret: string;
+};
+
 //#endregion Types

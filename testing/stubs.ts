@@ -3,7 +3,7 @@ import {
   RequestClient,
   SignInResultInterface,
   UnAuthenticatedResultInterface,
-} from "../contracts";
+} from "../types";
 
 export const AUTHENTICATED_RESULT = {
   authToken: "<TOKEN>",

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { RequiredProp, SignInResultInterface } from '../../contracts';
+import { RequiredProp, SignInResultInterface } from '../../types';
 import { tokenCan } from '../helpers';
 
 /**
