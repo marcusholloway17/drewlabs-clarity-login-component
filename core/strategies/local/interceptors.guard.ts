@@ -10,7 +10,7 @@ import { AuthClientConfig } from "./types";
 @Injectable({
   providedIn: "root",
 })
-export class ClientAuthorizationInterceptor
+export class AuthClientInterceptor
   implements HttpInterceptor, OnDestroy
 {
   constructor(

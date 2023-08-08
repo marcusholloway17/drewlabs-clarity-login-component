@@ -21,7 +21,9 @@ import {
   provideAuthActionHandlersFactory,
   AuthClientConfig,
   AUTH_CLIENT_CONFIG,
+  AuthClientInterceptor,
 } from "./core";
+import { HTTP_INTERCEPTORS } from "@angular/common/http";
 
 @NgModule({
   imports: [
@@ -44,6 +46,7 @@ export class LoginModule {
   }): ModuleWithProviders<LoginModule> {
     const { handleActions, authConfigProvider, authClientConfigProvider } =
       config;
+
     return {
       ngModule: LoginModule,
       providers: [
@@ -77,6 +80,11 @@ export class LoginModule {
               } as AuthClientConfig;
             }),
           deps: [Injector],
+        },
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: AuthClientInterceptor,
+          multi: true,
         },
       ],
     };
