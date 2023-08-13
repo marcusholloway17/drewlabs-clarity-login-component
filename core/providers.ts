@@ -44,11 +44,7 @@ export function provideAuthActionHandlersFactory(handlers: ActionHandlersType) {
     return {
       onAuthenticationFailure: fail,
       onAuthenticaltionSuccessful: success,
-      onPerformingAction:
-        performingAction ??
-        (() => {
-          console.log("Authenticating, please wait...");
-        }),
+      onPerformingAction: performingAction ?? (() => {}),
       onError:
         error ??
         ((err?: unknown) => {
