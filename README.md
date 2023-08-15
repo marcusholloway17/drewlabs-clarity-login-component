@@ -21,15 +21,12 @@ import { DOCUMENT_SESSION_STORAGE } from "@azlabsjs/ngx-storage";
         return {
           success: () => {
             // TODO: Provide successful login implementation
-            console.log("Successful login...");
           },
           failure: () => {
             // TODO: Provide failure login implementation
-            console.log("Authentication failed...");
           },
           error: (err: unknown) => {
             // TODO: Provide login error handler
-            console.error("Authentication request error", err);
           },
           performingAction: () => {},
         };

@@ -150,7 +150,7 @@ export class UITextPipe implements PipeTransform {
 
   private resolveText(key: string | string[], interpolateParams?: object) {
     if (typeof key === "undefined" || key === null || !key.length) {
-      throw new Error(`Parameter "key" required`);
+      throw new Error(`Parameter  "key" required`);
     }
     const isArrayKeys = Array.isArray(key);
     const keys = (isArrayKeys ? key : [key]) as string[];
