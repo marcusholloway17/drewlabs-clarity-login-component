@@ -8,9 +8,10 @@ import {
 import { ActivatedRoute, Router } from "@angular/router";
 import { map, tap } from "rxjs/operators";
 import { Subject } from "rxjs";
-import { AuthServiceInterface } from "./types";
-import { AuthActions, AuthStrategies, AUTH_SERVICE } from "./constants";
-import { AuthService } from "./core/auth.service";
+import { AuthServiceInterface } from "../types";
+import { AuthActions, AuthStrategies, AUTH_SERVICE } from "../constants";
+import { AuthService } from "../core";
+
 @Component({
   selector: "app-login",
   template: `
@@ -29,10 +30,14 @@ export class LoginComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
   private data: { [index: string]: any } = this.route.snapshot.data;
   // View text declarations
+
+  // #region Component inputs
   @Input() moduleName = this.data["moduleName"];
   loginHeadingText = this.data["loginHeadingText"];
   @Input() logoAssetPath = this.data["logoAssetPath"];
   @Input() hasRememberMe = this.data["hasRememberMe"] ?? false;
+  // #region Component inputs
+
   performingAction$ = (this.auth as AuthService)?.actionsState$.pipe(
     map((state) => {
       switch (state) {
@@ -46,6 +51,8 @@ export class LoginComponent implements OnDestroy {
       }
     })
   );
+
+  // Class constructor
   constructor(
     public route: ActivatedRoute,
     @Inject(AUTH_SERVICE) private auth: AuthServiceInterface,
@@ -69,5 +76,8 @@ export class LoginComponent implements OnDestroy {
   async onChildComponentFormSubmitted(event: { [index: string]: any }) {
     await this.auth.signIn(AuthStrategies.LOCAL, event).toPromise();
   }
-  ngOnDestroy = () => this.destroy$.next();
+
+  ngOnDestroy() {
+    this.destroy$.next();
+  }
 }

@@ -1,6 +1,6 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { RequiredProp, SignInResultInterface } from '../../types';
-import { tokenCan } from '../helpers';
+import { Pipe, PipeTransform } from "@angular/core";
+import { RequiredProp, SignInResultInterface } from "../../types";
+import { tokenCan } from "../../core";
 
 /**
  * Instead of using helper function, or rxjs operators [tokenCan$]
@@ -8,7 +8,7 @@ import { tokenCan } from '../helpers';
  * all provided scopes
  */
 @Pipe({
-  name: 'tokenCan',
+  name: "tokenCan",
 })
 export class TokenCanPipe implements PipeTransform {
   /**
@@ -18,10 +18,10 @@ export class TokenCanPipe implements PipeTransform {
    * @param scopes
    */
   transform(
-    value: RequiredProp<SignInResultInterface, 'scopes'>,
+    value: RequiredProp<SignInResultInterface, "scopes">,
     ...scopes: string[]
   ) {
-    if (typeof value === 'undefined' || value === null) {
+    if (typeof value === "undefined" || value === null) {
       return false;
     }
     return tokenCan(value, ...scopes);

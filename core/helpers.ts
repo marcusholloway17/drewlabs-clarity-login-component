@@ -1,4 +1,8 @@
-import { RequiredProp, SignInResultInterface } from '../types';
+import { first, timer } from "rxjs";
+import { RequiredProp, SignInResultInterface } from "../types";
+import { ActionHandlersType } from "./types";
+import { Injector } from "@angular/core";
+import { Router } from "@angular/router";
 
 /**
  * @description Get the host part of a given URL
@@ -9,11 +13,10 @@ export const host = (url: string) => {
   if (url) {
     const url_ = new URL(url);
     url = `${url_.protocol}//${url_.host}`;
-    return `${`${url.endsWith('/') ? url.slice(0, -1) : url}`}`;
+    return `${`${url.endsWith("/") ? url.slice(0, -1) : url}`}`;
   }
-  return url ?? '';
+  return url ?? "";
 };
-
 
 /**
  * Checks if the sign token has all of provided scopes
@@ -28,7 +31,7 @@ export const host = (url: string) => {
  * @returns
  */
 export function tokenCan(
-  signInResult: RequiredProp<SignInResultInterface, 'scopes'>,
+  signInResult: RequiredProp<SignInResultInterface, "scopes">,
   ...scopes: string[]
 ) {
   // Case the list of scopes is not provided we simply return true
@@ -63,7 +66,7 @@ export function tokenCan(
  * @returns
  */
 export function tokenCanAny(
-  signInResult: RequiredProp<SignInResultInterface, 'scopes'>,
+  signInResult: RequiredProp<SignInResultInterface, "scopes">,
   ...scopes: string[]
 ) {
   // Case the list of scopes is not provided we simply return true
@@ -82,4 +85,38 @@ export function tokenCanAny(
     }
   }
   return result;
+}
+
+/**
+ * Provides a factory function for authentication action handlers
+ */
+export function provideAuthActionHandlersFactory(handlers: ActionHandlersType) {
+  return (injector: Injector, router: Router) => {
+    const _handlers =
+      typeof handlers === "function" && handlers !== null
+        ? handlers(injector)
+        : handlers;
+    const {
+      success,
+      failure: fail,
+      error,
+      performingAction,
+      loginPath,
+    } = _handlers;
+    return {
+      onAuthenticationFailure: fail,
+      onAuthenticaltionSuccessful: success,
+      onPerformingAction: performingAction ?? (() => {}),
+      onError:
+        error ??
+        ((err?: unknown) => {
+          console.error("Authentication request Error: ", err);
+        }),
+      onLogout: () => {
+        timer(300)
+          .pipe(first())
+          .subscribe(() => router.navigate([loginPath ?? "login"]));
+      },
+    };
+  };
 }

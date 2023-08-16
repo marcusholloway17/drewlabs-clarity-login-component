@@ -14,7 +14,7 @@ import { AuthServiceInterface } from "../types";
 @Injectable({
   providedIn: "root",
 })
-export class UnAuthorizedResponseInterceptorGuard implements HttpInterceptor {
+export class UnAuthorizedInterceptor implements HttpInterceptor {
   constructor(
     @Inject(AUTH_SERVICE)
     private auth: AuthServiceInterface

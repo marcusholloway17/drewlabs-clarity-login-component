@@ -1,4 +1,4 @@
-export const defaultUITexts = {
+export const defaultCommonStrings = {
   login: {
     username: {
       label: "Username",
