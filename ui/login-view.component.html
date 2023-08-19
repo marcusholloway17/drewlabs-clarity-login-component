@@ -7,24 +7,24 @@
             <img alt="application-logo" [src]="logoAssetPath" [alt]="companyName" />
           </div>
           <span class="module-name">{{ moduleName}}</span>
-          <h5 class="hint">{{ 'login.loginSubText' | commonString}}</h5>
+          <h5 class="hint">{{ 'loginSubText' | commonString}}</h5>
         </div>
         <clr-input-container>
-          <label class="clr-sr-only">{{ 'login.username.label' | commonString}}</label>
+          <label class="clr-sr-only">{{ 'username.label' | commonString}}</label>
           <input aria-label="username" type="text" name="username" clrInput
-            [placeholder]="'login.username.label' | commonString" formControlName="username" />
+            [placeholder]="'username.label' | commonString" formControlName="username" />
         </clr-input-container>
         <clr-password-container>
-          <label class="clr-sr-only">{{'login.password.label' | commonString}}</label>
+          <label class="clr-sr-only">{{'password.label' | commonString}}</label>
           <input aria-label="password" type="password" name="password" clrPassword
-            [placeholder]="'login.password.label' | commonString" formControlName="password" />
+            [placeholder]="'password.label' | commonString" formControlName="password" />
         </clr-password-container>
         <clr-checkbox-wrapper *ngIf="hasRememberMe">
-          <label>{{ 'login.remember.label'| commonString}}</label>
+          <label>{{ 'remember.label'| commonString}}</label>
           <input aria-label="remember-me" type="checkbox" name="remember" clrCheckbox formControlName="remember" />
         </clr-checkbox-wrapper>
         <button title="sumit-button" type="submit" [disabled]="performingAction" class="btn btn-primary">{{
-          'login.loginBtnText' | commonString}}</button>
+          'loginBtnText' | commonString}}</button>
         <div class="app-login-footer">
           <div class="app-login-logo-description">Powered by LIKSOFT</div>
         </div>

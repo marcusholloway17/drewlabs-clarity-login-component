@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { map, tap } from "rxjs/operators";
-import { Subject } from "rxjs";
+import { Subject, firstValueFrom } from "rxjs";
 import { AuthServiceInterface } from "../types";
 import { AuthActions, AuthStrategies, AUTH_SERVICE } from "../constants";
 import { AuthService } from "../core";
@@ -74,7 +74,7 @@ export class LoginComponent implements OnDestroy {
   }
   // tslint:disable-next-line: typedef
   async onChildComponentFormSubmitted(event: { [index: string]: any }) {
-    await this.auth.signIn(AuthStrategies.LOCAL, event).toPromise();
+    await firstValueFrom(this.auth.signIn(AuthStrategies.LOCAL, event));
   }
 
   ngOnDestroy() {

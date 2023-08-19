@@ -4,4 +4,5 @@ export {
   ProvideCommonStringsType,
   provideCommonStrings,
   provideCommonStringsFactory,
+  COMMON_STRINGS,
 } from "./common-strings";

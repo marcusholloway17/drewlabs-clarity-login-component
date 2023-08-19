@@ -71,7 +71,9 @@ export class CommonStringsPipe implements PipeTransform {
     this._search = query;
 
     this._subscription = this._commonStrings
-      .pipe(map((value) => getObjectProperty(value, query)))
+      .pipe(map((value) => {
+        return getObjectProperty(value, query);
+      }))
       .subscribe((result) => this._updateLatestValue(query, result));
   }
 

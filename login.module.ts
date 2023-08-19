@@ -92,9 +92,6 @@ export class LoginModule {
       providers.push(provideCommonStrings(strings));
     }
 
-    return {
-      ngModule: LoginModule,
-      providers,
-    };
+    return { ngModule: LoginModule, providers };
   }
 }

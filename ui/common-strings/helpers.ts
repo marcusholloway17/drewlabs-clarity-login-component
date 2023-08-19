@@ -20,9 +20,7 @@ function provideCommonStringsValue(
 ) {
   return {
     provide: COMMON_STRINGS,
-    useFactory: () => {
-      return isObservable(values) ? values : of(values);
-    },
+    useFactory: () => (isObservable(values) ? values : of(values)),
   } as Provider;
 }
 
