@@ -4,7 +4,7 @@ import {
   EventEmitter,
   Input,
   Output,
-  ViewChild
+  ViewChild,
 } from "@angular/core";
 import {
   AbstractControl,
@@ -12,7 +12,7 @@ import {
   FormBuilder,
   FormGroup,
   NgForm,
-  Validators
+  Validators,
 } from "@angular/forms";
 
 @Component({
@@ -70,15 +70,12 @@ export class LoginViewComponent {
       if (control.get(field) instanceof FormGroup) {
         this.validateFormGroupFields(control.get(field) as FormGroup);
       } else {
-        this.markControlAsTouched(control.get(field) || undefined, field);
+        this.markControlAsTouched(control.get(field) || undefined);
       }
     });
   }
 
-  private markControlAsTouched(
-    control?: AbstractControl,
-    field?: string
-  ): void {
+  private markControlAsTouched(control?: AbstractControl): void {
     if (control) {
       control?.markAsTouched({ onlySelf: true });
       control?.markAsDirty({ onlySelf: true });

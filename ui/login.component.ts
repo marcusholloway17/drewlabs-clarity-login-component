@@ -4,6 +4,7 @@ import {
   OnDestroy,
   Inject,
   Input,
+  Injector,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { map, tap } from "rxjs/operators";
@@ -17,7 +18,7 @@ import { AuthService } from "../core";
   template: `
     <app-login-view
       [performingAction]="(performingAction$ | async) || false"
-      (formSubmitted)="onChildComponentFormSubmitted($event)"
+      (formSubmitted)="handleSubmit($event)"
       (loadRegistrationViewEvent)="router.navigateByUrl('/register')"
       [moduleName]="moduleName"
       [logoAssetPath]="logoAssetPath"
@@ -28,14 +29,15 @@ import { AuthService } from "../core";
 export class LoginComponent implements OnDestroy {
   // Properties definitions
   private destroy$ = new Subject<void>();
-  private data: { [index: string]: any } = this.route.snapshot.data;
+  public readonly router = this.injector.get(Router);
+  // private data: { [index: string]: any } = this.route.snapshot.data;
   // View text declarations
 
   // #region Component inputs
-  @Input() moduleName = this.data["moduleName"];
-  loginHeadingText = this.data["loginHeadingText"];
-  @Input() logoAssetPath = this.data["logoAssetPath"];
-  @Input() hasRememberMe = this.data["hasRememberMe"] ?? false;
+  @Input() moduleName!: string;
+  @Input() loginHeadingText!: string;
+  @Input() logoAssetPath!: string;
+  @Input() hasRememberMe!: string;
   // #region Component inputs
 
   performingAction$ = (this.auth as AuthService)?.actionsState$.pipe(
@@ -54,10 +56,19 @@ export class LoginComponent implements OnDestroy {
 
   // Class constructor
   constructor(
-    public route: ActivatedRoute,
+    public readonly route: ActivatedRoute,
     @Inject(AUTH_SERVICE) private auth: AuthServiceInterface,
-    public readonly router: Router
+    public readonly injector: Injector
   ) {
+    // #region Set Login component properties
+    const { moduleName, loginHeadingText, logoAssetPath, hasRememberMe, path } =
+      this.route.snapshot.data;
+    this.moduleName = moduleName;
+    this.loginHeadingText = loginHeadingText;
+    this.logoAssetPath = logoAssetPath;
+    this.hasRememberMe = hasRememberMe;
+    // #endregion  Set Login component properties
+
     this.auth.signInState$
       .pipe(
         tap((state) => {
@@ -65,15 +76,19 @@ export class LoginComponent implements OnDestroy {
           if (state) {
             // TODO : NAVIGATE TO THE APPLICATION DASHBOARD
             setTimeout(() => {
-              this.router.navigateByUrl(`/${this.data["path"]}`);
+              if (typeof path === "function" && path !== null) {
+                return path(this.injector, state);
+              }
+              return this.router.navigateByUrl(`/${path}`);
             }, 300);
           }
         })
       )
       .subscribe();
   }
+
   // tslint:disable-next-line: typedef
-  async onChildComponentFormSubmitted(event: { [index: string]: any }) {
+  async handleSubmit(event: { [index: string]: any }) {
     await firstValueFrom(this.auth.signIn(AuthStrategies.LOCAL, event));
   }
 

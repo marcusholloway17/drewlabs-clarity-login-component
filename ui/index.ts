@@ -6,3 +6,10 @@ export {
   provideCommonStringsFactory,
   COMMON_STRINGS,
 } from "./common-strings";
+
+export {
+  AuthDirectivesModule,
+  IfAuthenticatedDirective,
+  IfHasAnyScopeDirective,
+  IfHasScopesDirective,
+} from "./directives";

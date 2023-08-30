@@ -19,6 +19,7 @@ import { ClarityModule } from "@clr/angular";
     ClarityModule,
     CommonStringsModule,
   ],
+
   declarations: [...LOGIN_NAVIGATION_COMPONENTS],
 })
 export class LoginModule {}
