@@ -55,7 +55,7 @@ export const canActivate: CanActivateFn = (
   return timer(300).pipe(
     mergeMap(() =>
       auth.signInState$.pipe(
-        map((state) => (state ? true : false)),
+        map((state) => (state?.authToken ? true : false)),
         map((signedIn) =>
           signedIn ? signedIn : router.createUrlTree(["/login"])
         )
@@ -76,7 +76,7 @@ export function canActivateChild(
   return timer(300).pipe(
     mergeMap(() =>
       auth.signInState$.pipe(
-        map((state) => (state ? true : false)),
+        map((state) => (state?.authToken ? true : false)),
         map((signedIn) =>
           signedIn ? signedIn : router.createUrlTree(["/login"])
         )
@@ -147,12 +147,12 @@ export function tokenCanAnyMatch(route: Route, segments: UrlSegment[]) {
   return timer(300).pipe(
     mergeMap(() =>
       auth.signInState$.pipe(
-        map((state) => state?.scopes ?? []),
-        map((scopes) => {
+        map((state) => {
+          const { scopes, authToken } = state ?? {};
           const _scopes = route?.data
             ? route?.data["authorizations"] ?? route?.data["scopes"]
             : [];
-          return matchAny(scopes, _scopes);
+          return authToken && matchAny(scopes ?? [], _scopes);
         }),
         map((result) => (result ? result : router.createUrlTree(["/login"])))
       )
@@ -170,12 +170,12 @@ export function tokenCanMatch(route: Route, segments: UrlSegment[]) {
   return timer(300).pipe(
     mergeMap(() =>
       auth.signInState$.pipe(
-        map((state) => state?.scopes ?? []),
-        map((scopes) => {
+        map((state) => {
+          const { scopes, authToken } = state ?? {};
           const _scopes = route?.data
             ? route?.data["authorizations"] ?? route?.data["scopes"]
             : [];
-          return match(scopes, _scopes);
+          return authToken && match(scopes ?? [], _scopes);
         }),
         map((result) => (result ? result : router.createUrlTree(["/login"])))
       )

@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnDestroy, Optional } from '@angular/core';
+import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import {
   forkJoin,
   from,
@@ -7,7 +7,7 @@ import {
   ReplaySubject,
   Subject,
   throwError,
-} from 'rxjs';
+} from "rxjs";
 import {
   AuthActions,
   AuthStrategies,
@@ -16,7 +16,7 @@ import {
   ERR_NOT_INITIALIZED,
   ERR_NOT_SUPPORTED_FOR_REFRESH_TOKEN,
   AUTH_ACTION_HANDLERS,
-} from '../constants';
+} from "../constants";
 import {
   AuthServiceConfig,
   SignInResultInterface,
@@ -24,18 +24,18 @@ import {
   AuthStrategiesContainer,
   AuthServiceInterface,
   AuthActionHandlers,
-} from '../types';
-import { catchError, startWith, takeUntil, tap } from 'rxjs/operators';
+} from "../types";
+import { catchError, startWith, takeUntil, tap } from "rxjs/operators";
 
 const isPromise = (p: any) => {
-  return typeof p === 'object' && typeof p.then === 'function' ? true : false;
+  return typeof p === "object" && typeof p.then === "function" ? true : false;
 };
 
 const asObservable = (state: any) =>
   isObservable(state) ? state : isPromise(state) ? from(state) : of(state);
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthService
   implements AuthServiceInterface, AuthStrategiesContainer, OnDestroy
@@ -90,8 +90,7 @@ export class AuthService
         return strategy.signInState$.pipe(
           tap((signInResult) => {
             if (signInResult) {
-              this._signInResult = { ...signInResult, provider: key };
-              this._signInState$.next(this._signInResult);
+              this.setSignInState({ ...signInResult, provider: key });
             }
           })
         );
@@ -111,7 +110,7 @@ export class AuthService
           Array.from(this.strategies.entries()).map(async ([key, provider]) => {
             let signInResult = await provider.getLoginStatus();
             if (signInResult) {
-              this._signInState$.next(signInResult);
+              this.setSignInState(signInResult);
             }
           })
         );
@@ -148,8 +147,8 @@ export class AuthService
     if (!this.initialized) {
       return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
-    const strategy = this.strategies.get(id);
-    if (typeof strategy === 'undefined' || strategy === null) {
+    const strategy = this.strategies.get(id.toUpperCase());
+    if (typeof strategy === "undefined" || strategy === null) {
       return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
     this._actionsState$.next(AuthActions.ONGOING);
@@ -181,14 +180,15 @@ export class AuthService
       return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
     if (
-      typeof this._signInResult === 'undefined' ||
+      typeof this._signInResult === "undefined" ||
       this._signInResult === null
     ) {
       this.onLoggedOut();
-      return throwError(() => new Error(ERR_NOT_INITIALIZED));
+      return throwError(() => ERR_NOT_INITIALIZED);
     }
-    const strategy = this.strategies.get(this._signInResult?.provider);
-    if (typeof strategy === 'undefined' || strategy === null) {
+    const provider = this._signInResult?.provider;
+    const strategy = this.strategies.get(provider?.toUpperCase());
+    if (typeof strategy === "undefined" || strategy === null) {
       this.onLoggedOut();
       return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
@@ -213,15 +213,19 @@ export class AuthService
   }
 
   private onLoggedOut() {
-    this._signInState$.next(undefined);
-    this._signInResult = undefined;
+    this.setSignInState(undefined);
     this.handlers?.onLogout();
+  }
+
+  private setSignInState(state: SignInResultInterface | undefined) {
+    this._signInState$.next(state);
+    this._signInResult = state;
   }
 
   private applyConfigs(config: AuthServiceConfig) {
     this.autologin = config.autoLogin ?? false;
     config.strategies.forEach((item) => {
-      this.strategies.set(item.id, item.strategy);
+      this.strategies.set(item.id.toUpperCase(), item.strategy);
     });
     return config.onError ?? console.error;
   }
