@@ -1,17 +1,12 @@
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
 import {
-  catchError,
   forkJoin,
   from,
   isObservable,
-  lastValueFrom,
   of,
   ReplaySubject,
-  startWith,
   Subject,
-  tap,
   throwError,
-  takeUntil,
 } from "rxjs";
 import {
   AuthActions,
@@ -29,7 +24,8 @@ import {
   AuthStrategiesContainer,
   AuthServiceInterface,
   AuthActionHandlers,
-} from "../contracts";
+} from "../types";
+import { catchError, startWith, takeUntil, tap } from "rxjs/operators";
 
 const isPromise = (p: any) => {
   return typeof p === "object" && typeof p.then === "function" ? true : false;
@@ -48,13 +44,13 @@ export class AuthService
   private strategies = new Map<string, StrategyInterface>();
   private autologin = false;
 
-  private _signInResult!: SignInResultInterface|undefined;
+  private _signInResult!: SignInResultInterface | undefined;
 
-  private _signInState$ = new ReplaySubject<SignInResultInterface|undefined>(1);
+  private _signInState$ = new ReplaySubject<SignInResultInterface | undefined>(
+    1
+  );
   /** An `Observable` that one can subscribe to get the current logged in user information */
-  public signInState$ = this._signInState$
-    .asObservable()
-    .pipe(tap(console.log));
+  public signInState$ = this._signInState$.asObservable();
 
   /* Consider making this an enum comprising LOADING, LOADED, FAILED etc. */
   private initialized = false;
@@ -94,8 +90,7 @@ export class AuthService
         return strategy.signInState$.pipe(
           tap((signInResult) => {
             if (signInResult) {
-              this._signInResult = { ...signInResult, provider: key };
-              this._signInState$.next(this._signInResult);
+              this.setSignInState({ ...signInResult, provider: key });
             }
           })
         );
@@ -104,20 +99,18 @@ export class AuthService
       .pipe(takeUntil(this._destroy$))
       .subscribe();
     try {
-      await lastValueFrom(
-        forkJoin([
-          Array.from(this.strategies.values()).map((strategy) =>
-            asObservable(strategy.initialize(this.autologin))
-          ),
-        ])
-      );
+      await forkJoin([
+        Array.from(this.strategies.values()).map((strategy) =>
+          asObservable(strategy.initialize(this.autologin))
+        ),
+      ]).toPromise();
 
       if (this.autologin) {
         await Promise.all(
           Array.from(this.strategies.entries()).map(async ([key, provider]) => {
             let signInResult = await provider.getLoginStatus();
             if (signInResult) {
-              this._signInState$.next(signInResult);
+              this.setSignInState({ ...signInResult, provider: key });
             }
           })
         );
@@ -154,7 +147,8 @@ export class AuthService
     if (!this.initialized) {
       return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
-    const strategy = this.strategies.get(id);
+    const provider = id.toUpperCase();
+    const strategy = this.strategies.get(provider);
     if (typeof strategy === "undefined" || strategy === null) {
       return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }
@@ -191,9 +185,10 @@ export class AuthService
       this._signInResult === null
     ) {
       this.onLoggedOut();
-      return throwError(() => new Error(ERR_NOT_INITIALIZED));
+      return throwError(() => ERR_NOT_INITIALIZED);
     }
-    const strategy = this.strategies.get(this._signInResult?.provider);
+    const provider = this._signInResult?.provider;
+    const strategy = this.strategies.get(provider?.toUpperCase());
     if (typeof strategy === "undefined" || strategy === null) {
       this.onLoggedOut();
       return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
@@ -219,15 +214,19 @@ export class AuthService
   }
 
   private onLoggedOut() {
-    this._signInState$.next(undefined);
-    this._signInResult = undefined;
+    this.setSignInState(undefined);
     this.handlers?.onLogout();
+  }
+
+  private setSignInState(state: SignInResultInterface | undefined) {
+    this._signInState$.next(state);
+    this._signInResult = state;
   }
 
   private applyConfigs(config: AuthServiceConfig) {
     this.autologin = config.autoLogin ?? false;
     config.strategies.forEach((item) => {
-      this.strategies.set(item.id, item.strategy);
+      this.strategies.set(item.id.toUpperCase(), item.strategy);
     });
     return config.onError ?? console.error;
   }

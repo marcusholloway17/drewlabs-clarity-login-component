@@ -3,12 +3,11 @@ import { AuthStrategies } from "../constants/strategies";
 import { SignInResultInterface } from "./signin";
 import { StrategyInterface } from "./strategy";
 
-
 export interface AuthStrategiesContainer {
   /**
    * @description Returns the strategy matching the user provided id or undefined if not found
    */
-  getStrategy(id: AuthStrategies): StrategyInterface|undefined;
+  getStrategy(id: AuthStrategies): StrategyInterface | undefined;
 }
 
 /**
@@ -21,11 +20,11 @@ export interface AuthServiceConfig {
 }
 
 export interface AuthActionHandlers {
-  onAuthenticaltionSuccessful: () => void,
-  onAuthenticationFailure: () => void,
-  onPerformingAction: () => void,
-  onError: () => void,
-  onLogout: () => void
+  onAuthenticaltionSuccessful: () => void;
+  onAuthenticationFailure: () => void;
+  onPerformingAction: () => void;
+  onError: () => void;
+  onLogout: () => void;
 }
 
 /**
@@ -35,11 +34,10 @@ export interface AuthActionHandlers {
  *
  */
 export interface AuthServiceInterface {
-
   /**
    * @description Signin operation result state
    */
-  signInState$: Observable<SignInResultInterface>;
+  signInState$: Observable<SignInResultInterface | undefined>;
 
   /**
    * A method used to sign in a user with a specific `Strategy`.
@@ -48,7 +46,10 @@ export interface AuthServiceInterface {
    * @param options Optional {@code Strategy} specific arguments
    * @returns A `Promise` that resolves to the authenticated user information
    */
-  signIn(id: AuthStrategies, options?: any): Observable<boolean> | Observable<any>;
+  signIn(
+    id: AuthStrategies,
+    options?: any
+  ): Observable<boolean> | Observable<any>;
 
   /**
    * A method used to sign out the currently loggen in user.

@@ -4,18 +4,17 @@ import {
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpResponse,
 } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { catchError, lastValueFrom, Observable, tap, throwError } from "rxjs";
-import { AUTH_ACTION_HANDLERS, AUTH_SERVICE } from "../constants";
-import { AuthActionHandlers, AuthServiceInterface } from "../contracts";
+import { Observable, lastValueFrom, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
+import { AUTH_SERVICE } from "../constants";
+import { AuthServiceInterface } from "../types";
 
 @Injectable({
   providedIn: "root",
 })
-export class UnAuthorizedResponseInterceptorGuard implements HttpInterceptor {
+export class UnAuthorizedInterceptor implements HttpInterceptor {
   constructor(
     @Inject(AUTH_SERVICE)
     private auth: AuthServiceInterface

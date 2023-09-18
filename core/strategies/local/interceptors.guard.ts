@@ -4,19 +4,19 @@ import {
   HttpHandler,
 } from "@angular/common/http";
 import { Inject, Injectable, OnDestroy, Optional } from "@angular/core";
-import { AUTH_CLIENT_CONFIG } from "../constants";
-import { AuthClientConfig } from "../contracts";
+import { AUTH_CLIENT_CONFIG } from "./tokens";
+import { AuthClientConfig } from "./types";
 
 @Injectable({
   providedIn: "root",
 })
-export class ClientAuthorizationInterceptor
+export class AuthClientInterceptor
   implements HttpInterceptor, OnDestroy
 {
   constructor(
     @Optional()
     @Inject(AUTH_CLIENT_CONFIG)
-    private config: AuthClientConfig
+    private config?: AuthClientConfig
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {

@@ -1,3 +1,17 @@
+// Module exports
 export { AuthService } from "./auth.service";
-export { LocalStrategy } from "./strategies/local-strategy";
-export { StrategyBasedAuthModule } from './auth.module';
+
+// Helpers
+export {
+  tokenCan,
+  tokenCanAny,
+  provideAuthActionHandlersFactory,
+} from "./helpers";
+
+// RxJS operators
+export { tokenCan$, tokenCanAny$ } from "./rx";
+
+// Strategies exports
+export * from "./strategies";
+
+export { ActionHandlersType } from "./types";

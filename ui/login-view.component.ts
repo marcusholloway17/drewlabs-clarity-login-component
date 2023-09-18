@@ -1,19 +1,19 @@
 import {
-  FormGroup,
-  AbstractControl,
-  NgForm,
-  FormBuilder,
-  FormArray,
-  Validators,
-} from "@angular/forms";
-import {
+  ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
   Output,
-  EventEmitter,
-  ChangeDetectionStrategy,
   ViewChild,
 } from "@angular/core";
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  NgForm,
+  Validators,
+} from "@angular/forms";
 
 @Component({
   selector: "app-login-view",
@@ -44,7 +44,8 @@ export class LoginViewComponent {
   // tslint:disable-next-line: no-inferrable-types
   @Input() loggedIn: boolean = false;
   @ViewChild("loginForm") loginForm!: NgForm;
-  @Input() public moduleName = "APPNAME";
+  @Input() public moduleName = "App Name";
+  @Input() public companyName = "Company Name";
   @Input() logoAssetPath = "...";
   @Input() hasRememberMe!: boolean;
 
@@ -69,15 +70,12 @@ export class LoginViewComponent {
       if (control.get(field) instanceof FormGroup) {
         this.validateFormGroupFields(control.get(field) as FormGroup);
       } else {
-        this.markControlAsTouched(control.get(field) || undefined, field);
+        this.markControlAsTouched(control.get(field) || undefined);
       }
     });
   }
 
-  private markControlAsTouched(
-    control?: AbstractControl,
-    field?: string
-  ): void {
+  private markControlAsTouched(control?: AbstractControl): void {
     if (control) {
       control?.markAsTouched({ onlySelf: true });
       control?.markAsDirty({ onlySelf: true });

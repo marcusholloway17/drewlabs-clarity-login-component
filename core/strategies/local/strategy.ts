@@ -1,45 +1,48 @@
 import { BehaviorSubject, Observable, of, Subject } from "rxjs";
-import { map, mergeMap } from "rxjs/operators";
+import { finalize, map, mergeMap } from "rxjs/operators";
 import {
+  DoubleAuthSignInResultInterface,
+  RequestClient,
   SignInOptionsType,
+  SignInResult,
   SignInResultInterface,
   StrategyInterface,
-  DoubleAuthSignInResultInterface,
-  SignInResult,
   UnAuthenticatedResultInterface,
-  RequestClient,
-} from "../../contracts";
-import { host } from "../helpers";
+} from "../../../types";
+import { host } from "../../helpers";
+import { DEFAULT_ENDPOINTS, LOCAL_SIGNIN_RESULT_CACHE } from "./defaults";
+import { RESTInterfaceType, SingInResultType, UserInterface } from "./types";
 
-type GetUserDetailsResult = {
-  id: number | string;
-  username: string;
-  user_details: {
-    firstname: string;
-    lastname: string;
-    address?: string;
-    phone_number?: string;
-    profile_url?: string;
-    emails: string[];
-  };
-  double_auth_active: boolean;
-  authorizations: string[];
-  roles: string[];
-};
-
-const LOCAL_API_GET_USER = "auth/v2/user";
-
-const LOCAL_API_LOGIN = "auth/v2/login";
-
-const LOCAL_API_LOGOUT = "auth/v2/logout";
-
-const LOCAL_SIGNIN_RESULT_CACHE = "LOCAL_STRATEGY_SIGNIN_RESULT_CACHE";
-
+/**
+ * Local strategy provides interface for authenticating first party
+ * application users via bearer token.
+ *
+ * **Note**
+ * Implementation flow is based on drewlabs identity web service. Provide
+ * your own implementation inspired by the current implementation  if
+ * using a service other that the service mention above.
+ *
+ * **Note**
+ * By default, the strategy implementation use default routes prefixed by
+ * `/auth/v2`. To change the default behavior, pass the required endpoint
+ * as parameter to the constructor:
+ *
+ * ```ts
+ *
+ *
+ * // Example using api/v2/ as prefix to authentication routes
+ * const strategy = new LocalStrategy(client, host, {
+ *    users: "api/v2/user",
+ *    signIn: "api/v2/login",
+ *    signOut: "api/v2/logout"
+ * })
+ * ```
+ */
 export class LocalStrategy implements StrategyInterface {
   // Properties definition
-  _signInState$ = new BehaviorSubject<SignInResultInterface|undefined>(undefined);
+  private endpoints: RESTInterfaceType;
+  private _signInState$ = new BehaviorSubject<SingInResultType>(undefined);
   signInState$ = this._signInState$.asObservable();
-
   private _request2FaConsent$ = new Subject<string>();
   request2FaConsent$ = this._request2FaConsent$.asObservable();
 
@@ -47,8 +50,11 @@ export class LocalStrategy implements StrategyInterface {
   constructor(
     private http: RequestClient,
     private host: string,
-    private cache?: Storage
-  ) {}
+    private cache?: Storage,
+    endpoints?: Partial<RESTInterfaceType>
+  ) {
+    this.endpoints = { ...DEFAULT_ENDPOINTS, ...(endpoints ?? {}) };
+  }
 
   initialize(autologin?: boolean): Observable<void> {
     // TODO : If Auto-login is true, load the signIn result from the cache storage
@@ -57,7 +63,7 @@ export class LocalStrategy implements StrategyInterface {
   }
 
   getLoginStatus() {
-    return new Promise<SignInResultInterface|undefined>((resolve, reject) => {
+    return new Promise<SingInResultType>((resolve, reject) => {
       if (this.cache) {
         const value = this.cache.getItem(LOCAL_SIGNIN_RESULT_CACHE) as any;
         if (typeof value === "undefined" || value === null) {
@@ -74,30 +80,28 @@ export class LocalStrategy implements StrategyInterface {
 
   signIn(options?: SignInOptionsType) {
     return this.http
-      .post(`${host(this.host)}/${LOCAL_API_LOGIN}`, options)
+      .post(`${host(this.host)}/${this.endpoints.signIn}`, options)
       .pipe(
         mergeMap((state: SignInResult) => {
-          if ((state as DoubleAuthSignInResultInterface).is2faEnabled) {
-            this._request2FaConsent$.next(
-              (state as DoubleAuthSignInResultInterface).auth2faToken
-            );
+          let authState: SignInResult =
+            state as DoubleAuthSignInResultInterface;
+          if (authState.is2faEnabled) {
+            this._request2FaConsent$.next(authState.auth2faToken);
             return of(true);
           }
-
-          if (Boolean((state as UnAuthenticatedResultInterface).locked)) {
+          authState = state as UnAuthenticatedResultInterface;
+          if (Boolean(authState.locked)) {
             return of(false);
           }
-          const authenticated = (state as UnAuthenticatedResultInterface)
-            .authenticated;
+          const authenticated = authState.authenticated;
           if (
             !(null === authenticated || typeof authenticated === "undefined") &&
             Boolean(authenticated) === false
           ) {
             return of(false);
           }
-          console.log((state as Partial<SignInResultInterface>).authToken);
           return this.http
-            .get(`${host(this.host)}/${LOCAL_API_GET_USER}`, {
+            .get(`${host(this.host)}/${this.endpoints.users}`, {
               headers: {
                 Authorization: `Bearer ${
                   (state as Partial<SignInResultInterface>).authToken
@@ -105,7 +109,7 @@ export class LocalStrategy implements StrategyInterface {
               },
             })
             .pipe(
-              map((user: GetUserDetailsResult) => {
+              map((user: UserInterface) => {
                 if (state) {
                   const result = {
                     ...(state as SignInResultInterface),
@@ -119,8 +123,6 @@ export class LocalStrategy implements StrategyInterface {
                     address: user?.user_details?.address,
                   };
                   this._signInState$.next(result);
-
-                  // TODO : Add result details to cache for autologin
                   if (this.cache) {
                     this.cache.setItem(
                       LOCAL_SIGNIN_RESULT_CACHE,
@@ -137,14 +139,15 @@ export class LocalStrategy implements StrategyInterface {
 
   signOut(revoke?: boolean): Observable<boolean> {
     return this.http
-      .get(`${host(this.host)}/${LOCAL_API_LOGOUT}`, {
+      .get(`${host(this.host)}/${this.endpoints.users}`, {
         params: { revoke },
       })
       .pipe(
-        map(() => {
+        map(() => true),
+        finalize(() => {
+          // Cleanup the resources to prevent user from auto login next time
           this._signInState$.next(undefined);
           this.cache?.removeItem(LOCAL_SIGNIN_RESULT_CACHE);
-          return true;
         })
       );
   }

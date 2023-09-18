@@ -4,14 +4,15 @@ import {
   HttpHandler,
 } from "@angular/common/http";
 import { Inject, Injectable, OnDestroy } from "@angular/core";
-import { Subject, takeUntil, tap } from "rxjs";
+import { Subject } from "rxjs";
 import { AUTH_SERVICE } from "../constants";
-import { AuthServiceInterface } from "../contracts";
+import { AuthServiceInterface } from "../types";
+import { takeUntil, tap } from "rxjs/operators";
 
 @Injectable({
   providedIn: "root",
 })
-export class AuthInterceptorService implements HttpInterceptor, OnDestroy {
+export class AuthInterceptor implements HttpInterceptor, OnDestroy {
   // Service destroy handler
   private _destroy$ = new Subject<void>();
   // Authenticated user token
