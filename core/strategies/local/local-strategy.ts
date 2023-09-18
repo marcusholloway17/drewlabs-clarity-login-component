@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, of, Subject } from "rxjs";
-import { map, mergeMap } from "rxjs/operators";
+import { finalize, map, mergeMap } from "rxjs/operators";
 import {
   DoubleAuthSignInResultInterface,
   RequestClient,
@@ -11,12 +11,7 @@ import {
 } from "../../../types";
 import { host } from "../../helpers";
 import { DEFAULT_ENDPOINTS, LOCAL_SIGNIN_RESULT_CACHE } from "./defaults";
-import {
-  AuthClientConfig,
-  RESTInterfaceType,
-  SingInResultType,
-  UserInterface,
-} from "./types";
+import { RESTInterfaceType, SingInResultType, UserInterface } from "./types";
 
 /**
  * Local strategy provides interface for authenticating first party
@@ -56,8 +51,7 @@ export class LocalStrategy implements StrategyInterface {
     private http: RequestClient,
     private host: string,
     private cache?: Storage,
-    endpoints?: Partial<RESTInterfaceType>,
-    authClientConfig?: AuthClientConfig
+    endpoints?: Partial<RESTInterfaceType>
   ) {
     this.endpoints = { ...DEFAULT_ENDPOINTS, ...(endpoints ?? {}) };
   }
@@ -149,10 +143,11 @@ export class LocalStrategy implements StrategyInterface {
         params: { revoke },
       })
       .pipe(
-        map(() => {
+        map(() => true),
+        finalize(() => {
+          // Cleanup the resources to prevent user from auto login next time
           this._signInState$.next(undefined);
           this.cache?.removeItem(LOCAL_SIGNIN_RESULT_CACHE);
-          return true;
         })
       );
   }
