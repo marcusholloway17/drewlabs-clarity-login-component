@@ -110,7 +110,7 @@ export class AuthService
           Array.from(this.strategies.entries()).map(async ([key, provider]) => {
             let signInResult = await provider.getLoginStatus();
             if (signInResult) {
-              this.setSignInState(signInResult);
+              this.setSignInState({ ...signInResult, provider: key });
             }
           })
         );
@@ -147,7 +147,8 @@ export class AuthService
     if (!this.initialized) {
       return throwError(() => new Error(ERR_NOT_INITIALIZED));
     }
-    const strategy = this.strategies.get(id.toUpperCase());
+    const provider = id.toUpperCase();
+    const strategy = this.strategies.get(provider);
     if (typeof strategy === "undefined" || strategy === null) {
       return throwError(() => new Error(ERR_LOGIN_STRATEGY_NOT_FOUND));
     }

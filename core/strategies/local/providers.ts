@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { RESTInterfaceType } from "./types";
-import { LocalStrategy } from "./local-strategy";
+import { LocalStrategy } from "./strategy";
 
 type ProvideLocalStorageType = {
   client: HttpClient;
