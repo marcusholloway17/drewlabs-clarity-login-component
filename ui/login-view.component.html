@@ -62,14 +62,24 @@
         >
           {{ "loginBtnText" | commonString }}
         </button>
-        <button
-          type="button"
-          [routerLink]="['..', 'register']"
-          [disabled]="performingAction"
-          class="btn btn-primary-outline btn-link"
-        >
-          {{ "registerBtnText" | commonString }}
-        </button>
+        <div class="btn-group btn-link">
+          <button
+            type="button"
+            [routerLink]="['..', 'register']"
+            [disabled]="performingAction"
+            class="btn"
+          >
+            {{ "registerBtnText" | commonString }}
+          </button>
+          <button
+            type="button"
+            [routerLink]="['..', 'forgot-your-passord']"
+            [disabled]="performingAction"
+            class="btn"
+          >
+            {{ "PasswordForgotBtnText" | commonString }}
+          </button>
+        </div>
         <div class="app-login-footer">
           <div class="app-login-logo-description">Powered by LIKSOFT</div>
         </div>
