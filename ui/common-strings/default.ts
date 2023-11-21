@@ -20,5 +20,4 @@ export const defaultCommonStrings = {
   loginSubText: "Access your workspace with your credentials",
   successful: "You are successfully logged in. Redirecting ...",
   registerBtnText: "Register",
-  PasswordForgotBtnText: "Mot de passe oublié",
 };
