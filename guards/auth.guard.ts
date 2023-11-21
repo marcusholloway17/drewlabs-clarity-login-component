@@ -51,7 +51,7 @@ export class AuthGuardService implements OnDestroy {
       first(),
       map(() => {
         if (!this._signedIn) {
-          return this.router.createUrlTree(["/login"]);
+          return this.router.createUrlTree(["/auth/login"]);
         }
         return this._signedIn;
       })
